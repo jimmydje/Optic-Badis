@@ -2,48 +2,6 @@ export default function AdminPage() {
   return (
     <div className="flex min-h-screen bg-gray-100">
 
-      {/* ----- SIDEBAR ----- */}
-      <aside className="w-64 bg-white shadow-xl p-6">
-        <h2 className="text-2xl font-bold mb-8 text-blue-600">Admin</h2>
-
-        <nav className="space-y-4">
-          <a
-            href="/admin/produits"
-            className="block p-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition"
-          >
-            Produits
-          </a>
-
-          <a
-            href="/admin/commandes"
-            className="block p-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition"
-          >
-            Commandes
-          </a>
-
-          <a
-            href="/admin/clients"
-            className="block p-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition"
-          >
-            Clients
-          </a>
-
-          <a
-            href="/admin/settings"
-            className="block p-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition"
-          >
-            Paramètres
-          </a>
-
-          <a
-            href="/"
-            className="block p-3 rounded-lg hover:bg-red-50 hover:text-red-600 transition"
-          >
-            Déconnexion
-          </a>
-        </nav>
-      </aside>
-
       {/* ----- MAIN CONTENT ----- */}
       <main className="flex-1 p-10">
 

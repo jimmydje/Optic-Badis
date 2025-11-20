@@ -17,14 +17,13 @@ export default function HommePage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("");
-  const [marque, setMarque] = useState("");
+  const [marqueFilter, setMarqueFilter] = useState("");
 
   const perPage = 6;
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // ✅ Correction ici : on filtre par `categorie=Homme`
         const res = await fetch("/api/produits?categorie=Homme", { cache: "no-store" });
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
@@ -38,7 +37,6 @@ export default function HommePage() {
     fetchProducts();
   }, []);
 
-  // ✅ Fonction pour ajouter au panier
   const addToCart = (product: Product) => {
     const existing = localStorage.getItem("cart");
     let cart = existing ? JSON.parse(existing) : [];
@@ -59,17 +57,18 @@ export default function HommePage() {
     alert(`✅ ${product.nom} a été ajouté au panier !`);
   };
 
-  // 🔹 Filtres et tri
+  // FILTRE & TRI
   let filtered = [...products];
-  if (marque) filtered = filtered.filter((p) => p.marque === marque);
+  if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
   if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
   if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
-  if (sort === "date-new")
-    filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  if (sort === "date-new") filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
+  // PAGINATION
   const start = (page - 1) * perPage;
   const end = start + perPage;
   const visibleProducts = filtered.slice(start, end);
+
   const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
 
   return (
@@ -78,7 +77,7 @@ export default function HommePage() {
         Collection Homme 🕶️
       </h1>
 
-      {/* 🔹 Filtres */}
+      {/* FILTRES */}
       <div className="max-w-6xl mx-auto mb-8 flex flex-col md:flex-row justify-between gap-4">
         <select
           value={sort}
@@ -92,8 +91,8 @@ export default function HommePage() {
         </select>
 
         <select
-          value={marque}
-          onChange={(e) => setMarque(e.target.value)}
+          value={marqueFilter}
+          onChange={(e) => setMarqueFilter(e.target.value)}
           className="border rounded-lg px-4 py-2"
         >
           <option value="">Toutes les marques</option>
@@ -107,7 +106,7 @@ export default function HommePage() {
         <button
           onClick={() => {
             setSort("");
-            setMarque("");
+            setMarqueFilter("");
           }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
@@ -115,14 +114,12 @@ export default function HommePage() {
         </button>
       </div>
 
-      {/* 🔹 Liste produits */}
+      {/* PRODUITS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {loading ? (
           <p className="text-center col-span-3">Chargement...</p>
         ) : visibleProducts.length === 0 ? (
-          <p className="text-center col-span-3 text-gray-500">
-            Aucun produit trouvé
-          </p>
+          <p className="text-center col-span-3 text-gray-500">Aucun produit trouvé</p>
         ) : (
           visibleProducts.map((product) => (
             <div
@@ -135,13 +132,9 @@ export default function HommePage() {
                 className="w-full h-64 object-cover"
               />
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {product.nom}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-800">{product.nom}</h3>
                 <p className="text-gray-500 text-sm">{product.marque || "-"}</p>
-                <p className="text-blue-600 font-bold text-lg mt-2">
-                  {product.prix} €
-                </p>
+                <p className="text-blue-600 font-bold text-lg mt-2">{product.prix} €</p>
 
                 <button
                   onClick={() => addToCart(product)}
@@ -155,20 +148,15 @@ export default function HommePage() {
         )}
       </div>
 
-      {/* 🔹 Pagination */}
+      {/* PAGINATION */}
       {filtered.length > perPage && (
         <div className="flex justify-center mt-10 gap-2">
-          {Array.from(
-            { length: Math.ceil(filtered.length / perPage) },
-            (_, i) => i + 1
-          ).map((num) => (
+          {Array.from({ length: Math.ceil(filtered.length / perPage) }, (_, i) => i + 1).map((num) => (
             <button
               key={num}
               onClick={() => setPage(num)}
               className={`px-4 py-2 rounded-lg ${
-                page === num
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700 hover:bg-blue-100"
+                page === num ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-blue-100"
               } transition`}
             >
               {num}

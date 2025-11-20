@@ -6,8 +6,9 @@ interface Product {
   id: string;
   imageUrl?: string;
   nom: string;
-  brand?: string;
+  marque?: string;
   prix: number;
+  categorie?: string;
   createdAt: string;
 }
 
@@ -16,7 +17,7 @@ export default function FemmePage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState("");
-  const [brand, setBrand] = useState("");
+  const [marqueFilter, setMarqueFilter] = useState("");
 
   const perPage = 6;
   const totalPages = 12;
@@ -61,7 +62,7 @@ export default function FemmePage() {
 
   // Filtres & tri
   let filtered = [...products];
-  if (brand) filtered = filtered.filter((p) => p.brand === brand);
+  if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
   if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
   if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
   if (sort === "date-new") filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
@@ -69,7 +70,9 @@ export default function FemmePage() {
   const start = (page - 1) * perPage;
   const end = start + perPage;
   const visibleProducts = filtered.slice(start, end);
-  const brands = Array.from(new Set(products.map((p) => p.brand)));
+
+  // Liste des marques pour le filtre
+  const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
 
   return (
     <main className="px-6 py-12 bg-gray-50 min-h-screen">
@@ -86,14 +89,17 @@ export default function FemmePage() {
           <option value="date-new">Nouveautés</option>
         </select>
 
-        <select value={brand} onChange={(e) => setBrand(e.target.value)} className="border rounded-lg px-4 py-2">
+        <select value={marqueFilter} onChange={(e) => setMarqueFilter(e.target.value)} className="border rounded-lg px-4 py-2">
           <option value="">Toutes les marques</option>
-          {brands.map((b) => (
-            <option key={b} value={b}>{b}</option>
+          {marques.map((m) => (
+            <option key={m} value={m}>{m}</option>
           ))}
         </select>
 
-        <button onClick={() => { setSort(""); setBrand(""); }} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <button
+          onClick={() => { setSort(""); setMarqueFilter(""); }}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        >
           Réinitialiser
         </button>
       </div>
@@ -107,10 +113,14 @@ export default function FemmePage() {
         ) : (
           visibleProducts.map((product) => (
             <div key={product.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden">
-              <img src={product.imageUrl || "/images/default.jpg"} alt={product.nom} className="w-full h-64 object-cover" />
+              <img
+                src={product.imageUrl || "/images/default.jpg"}
+                alt={product.nom}
+                className="w-full h-64 object-cover"
+              />
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800">{product.nom}</h3>
-                <p className="text-gray-500 text-sm">{product.brand || "-"}</p>
+                <p className="text-gray-500 text-sm">{product.marque || "-"}</p>
                 <p className="text-blue-600 font-bold text-lg mt-2">{product.prix} €</p>
 
                 {/* Bouton Ajouter au panier */}
@@ -129,8 +139,11 @@ export default function FemmePage() {
       {/* Pagination */}
       <div className="flex justify-center mt-10 gap-2">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-          <button key={num} onClick={() => setPage(num)}
-            className={`px-4 py-2 rounded-lg ${page === num ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-blue-100"} transition`}>
+          <button
+            key={num}
+            onClick={() => setPage(num)}
+            className={`px-4 py-2 rounded-lg ${page === num ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-blue-100"} transition`}
+          >
             {num}
           </button>
         ))}

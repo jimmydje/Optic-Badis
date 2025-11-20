@@ -1,7 +1,12 @@
-import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
-export async function isAdminLoggedIn() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token")?.value;
-  return token === "secret_token_123"; // doit matcher ton token
+const JWT_SECRET = process.env.JWT_SECRET || "monSecretSuperSecret";
+
+export function verifyToken(token?: string) {
+  if (!token) return null;
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return null;
+  }
 }
