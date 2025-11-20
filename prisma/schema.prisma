@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id         String      @id @default(cuid())
+  nom        String
+  email      String      @unique
+  telephone  String?
+  createdAt  DateTime    @default(now())
+  commandes  Commande[]  @relation("ClientCommandes")
+}
+
+model Produit {
+  id             String          @id @default(cuid())
+  nom            String
+  description    String?
+  prix           Float
+  imageUrl       String?
+  categorie      String?         // saisie par l'utilisateur
+  stock          Int             @default(0)
+  itemsCommande  CommandeItem[]  @relation("ProduitItems")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Commande {
+  id          String         @id @default(cuid())
+  date        DateTime       @default(now())
+  statut      String         @default("En cours")
+  total       Float
+  client      Client         @relation("ClientCommandes", fields: [clientId], references: [id], onDelete: Cascade)
+  clientId    String
+  items       CommandeItem[] @relation("CommandeItems")
+}
+
+model CommandeItem {
+  id          String   @id @default(cuid())
+  commande    Commande @relation("CommandeItems", fields: [commandeId], references: [id], onDelete: Cascade)
+  commandeId  String
+  produit     Produit  @relation("ProduitItems", fields: [produitId], references: [id], onDelete: Cascade)
+  produitId   String
+  quantite    Int
+}
+
+// ✅ Modèle pour gérer les utilisateurs/admins
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
