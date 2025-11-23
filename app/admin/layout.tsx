@@ -2,18 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-
-// ⚠️ Ici, tu pourrais vérifier le token via cookie JWT
-async function checkAuth() {
-  try {
-    const res = await fetch("/api/admin/check", { cache: "no-store" });
-    if (!res.ok) throw new Error("Non autorisé");
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 const links = [
   { href: "/admin", label: "Dashboard" },
@@ -28,14 +16,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    checkAuth().then(setAuthorized);
-  }, []);
-
-  if (authorized === null) return <p>Chargement...</p>;
-  if (!authorized) return <p>⛔ Accès refusé. Veuillez vous connecter.</p>;
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -69,3 +49,5 @@ export default function DashboardLayout({
     </div>
   );
 }
+
+

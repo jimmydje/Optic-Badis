@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Produit {
   id: string;
@@ -15,6 +16,9 @@ interface Produit {
 export default function Home() {
   const [produits, setProduits] = useState<Produit[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // 🔵 État pour afficher le formulaire modal
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     async function fetchProduits() {
@@ -33,8 +37,33 @@ export default function Home() {
 
   const placeholderProduits = [1, 2, 3];
 
+  // 🔵 Fonction d’envoi du formulaire
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const formData = {
+      nom: e.target.nom.value,
+      email: e.target.email.value,
+      message: e.target.message.value,
+    };
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
+      alert("Votre message a été envoyé !");
+      setShowForm(false);
+    } else {
+      alert("Erreur lors de l’envoi.");
+    }
+  };
+
   return (
     <main className="text-gray-900">
+
       {/* 1ère partie */}
       <section className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] flex items-center justify-start bg-gray-100">
         <Image
@@ -109,7 +138,7 @@ export default function Home() {
 
       {/* Promo */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-6 bg-blue-50">
-        <h2 className="text-2xl sm:text-3xl md:text-3xl font-semibold text-center text-gray-800 mb-8 sm:mb-10">
+        <h2 className="text-2xl sm:sm:text-3xl md:text-3xl font-semibold text-center text-gray-800 mb-8 sm:mb-10">
           Offres et Promotions
         </h2>
 
@@ -128,12 +157,13 @@ export default function Home() {
               <div className="text-3xl sm:text-4xl md:text-4xl font-extrabold text-red-500 mb-4">
                 {idx === 0 ? "-20%" : idx === 1 ? "-30%" : "-35%"}
               </div>
-              <a
-                href="/shop"
-                className="bg-blue-600 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
-              >
-                Profiter
-              </a>
+
+              <Link href="/promotions">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  Profiter
+                </button>
+              </Link>
+
             </div>
           ))}
         </div>
@@ -148,20 +178,77 @@ export default function Home() {
           Une question ? Besoin d’un conseil ? Contactez-nous ou passez à la boutique.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <a
-            href="mailto:contact@badisoptic.com"
+
+          {/* 🔵 Ouvre le formulaire */}
+          <button
+            onClick={() => setShowForm(true)}
             className="bg-blue-600 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
           >
             Envoyer un e-mail
-          </a>
+          </button>
+
           <a
             href="tel:+213555555555"
             className="border border-blue-600 text-blue-600 px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-50 text-sm sm:text-base"
           >
-            +213555555555
+            +213-657-411-145
           </a>
         </div>
       </section>
+
+      {/* 🔵 FORMULAIRE MODAL */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+
+            <h3 className="text-xl font-bold mb-4 text-center">Envoyer un message</h3>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                name="nom"
+                placeholder="Votre nom"
+                className="w-full p-2 border rounded"
+                required
+              />
+
+              <input
+                type="email"
+                name="email"
+                placeholder="Votre e-mail"
+                className="w-full p-2 border rounded"
+                required
+              />
+
+              <textarea
+                name="message"
+                placeholder="Votre message"
+                className="w-full p-2 border rounded h-28"
+                required
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Annuler
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Envoyer
+                </button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }

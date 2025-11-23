@@ -2,29 +2,10 @@
 
 import Link from "next/link";
 import { ShoppingCart, Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<null | { role: string }>(null);
-
-  useEffect(() => {
-    async function checkAuth() {
-      const res = await fetch("/api/me"); // nouvelle route pour vérifier login
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-      } else {
-        setUser(null);
-      }
-    }
-    checkAuth();
-  }, []);
-
-  const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST" });
-    setUser(null);
-  };
 
   return (
     <nav className="bg-blue-50 text-black px-6 py-4 shadow-md">
@@ -38,29 +19,6 @@ export default function Navbar() {
           <Link href="/femme" className="hover:text-blue-600">Femme</Link>
           <Link href="/enfants" className="hover:text-blue-600">Enfants</Link>
           <Link href="/nouveautes" className="hover:text-blue-600">Nouveautes</Link>
-
-          {user ? (
-            <>
-              {user.role === "admin" && (
-                <Link href="/admin" className="font-semibold text-blue-700 hover:text-blue-900">
-                  Dashboard
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login"
-              className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-            >
-              Login
-            </Link>
-          )}
         </div>
 
         <div className="flex items-center gap-4">
