@@ -97,7 +97,7 @@ export default function AjouterProduitPage() {
 
         {/* Prix */}
         <div>
-          <label className="block text-gray-700 mb-1">Prix (€) *</label>
+          <label className="block text-gray-700 mb-1">Prix (DZD) *</label>
           <input
             type="number"
             name="prix"
