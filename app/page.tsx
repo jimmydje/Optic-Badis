@@ -25,9 +25,18 @@ export default function Home() {
       try {
         const res = await fetch("/api/produits?limit=3");
         const data = await res.json();
-        setProduits(data);
+
+        // 🔹 Assure-toi que data est bien un tableau
+        if (Array.isArray(data)) {
+          setProduits(data);
+        } else if (Array.isArray(data.produits)) {
+          setProduits(data.produits);
+        } else {
+          setProduits([]);
+        }
       } catch (error) {
         console.error("Erreur en récupérant les produits :", error);
+        setProduits([]);
       } finally {
         setLoading(false);
       }
@@ -73,7 +82,6 @@ export default function Home() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-black/40"></div>
-
         <div className="relative z-10 max-w-2xl px-4 sm:px-6 md:px-8">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
             The perfect <br /> Look
@@ -106,33 +114,36 @@ export default function Home() {
                   </div>
                 </div>
               ))
-            : produits.map((produit) => (
-                <div
-                  key={produit.id}
-                  className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
-                >
-                  <img
-                    src={produit.imageUrl || "/placeholder.jpg"}
-                    alt={produit.nom}
-                    className="w-full h-48 sm:h-56 md:h-64 object-cover"
-                  />
-                  <div className="p-4 space-y-2">
-                    <h3 className="font-semibold text-base sm:text-lg md:text-lg">
-                      {produit.nom}
-                    </h3>
-                    {produit.description && (
-                      <p className="text-gray-600 text-xs sm:text-sm md:text-sm">
-                        {produit.description}
-                      </p>
-                    )}
-                    {produit.prix !== undefined && (
-                      <p className="text-blue-600 font-bold text-sm sm:text-base md:text-base">
-                        {produit.prix} DA
-                      </p>
-                    )}
+            : Array.isArray(produits) && produits.length > 0
+              ? produits.map((produit) => (
+                  <div
+                    key={produit.id}
+                    className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
+                  >
+                    <img
+                      src={produit.imageUrl || "/placeholder.jpg"}
+                      alt={produit.nom}
+                      className="w-full h-48 sm:h-56 md:h-64 object-cover"
+                    />
+                    <div className="p-4 space-y-2">
+                      <h3 className="font-semibold text-base sm:text-lg md:text-lg">
+                        {produit.nom}
+                      </h3>
+                      {produit.description && (
+                        <p className="text-gray-600 text-xs sm:text-sm md:text-sm">
+                          {produit.description}
+                        </p>
+                      )}
+                      {produit.prix !== undefined && (
+                        <p className="text-blue-600 font-bold text-sm sm:text-base md:text-base">
+                          {produit.prix} DA
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              : <p className="text-center col-span-full">Aucun produit trouvé.</p>
+          }
         </div>
       </section>
 
@@ -163,7 +174,6 @@ export default function Home() {
                   Profiter
                 </button>
               </Link>
-
             </div>
           ))}
         </div>
@@ -179,7 +189,6 @@ export default function Home() {
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
 
-          {/* 🔵 Ouvre le formulaire */}
           <button
             onClick={() => setShowForm(true)}
             className="bg-blue-600 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
@@ -200,7 +209,6 @@ export default function Home() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-
             <h3 className="text-xl font-bold mb-4 text-center">Envoyer un message</h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -244,7 +252,6 @@ export default function Home() {
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}

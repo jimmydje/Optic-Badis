@@ -21,15 +21,16 @@ export default function HommePage() {
 
   const perPage = 6;
 
+  // Charger les produits Homme depuis l’API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Homme", { cache: "no-store" });
+        const res = await fetch("/api/produits?categorie=Homme");
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
         setProducts(data);
       } catch (err) {
-        console.error("Erreur chargement produits Homme:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -37,6 +38,7 @@ export default function HommePage() {
     fetchProducts();
   }, []);
 
+  // Ajouter au panier
   const addToCart = (product: Product) => {
     const existing = localStorage.getItem("cart");
     let cart = existing ? JSON.parse(existing) : [];
@@ -57,27 +59,26 @@ export default function HommePage() {
     alert(`✅ ${product.nom} a été ajouté au panier !`);
   };
 
-  // FILTRE & TRI
+  // Filtres & tri
   let filtered = [...products];
   if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
+
   if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
   if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
   if (sort === "date-new") filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
-  // PAGINATION
   const start = (page - 1) * perPage;
-  const end = start + perPage;
-  const visibleProducts = filtered.slice(start, end);
+  const visibleProducts = filtered.slice(start, start + perPage);
 
   const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
 
   return (
     <main className="px-6 py-12 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-semibold text-center text-gray-800 mb-10">
-        Collection Homme 🕶️
+        Collection Homme 👓
       </h1>
 
-      {/* FILTRES */}
+      {/* Filtres */}
       <div className="max-w-6xl mx-auto mb-8 flex flex-col md:flex-row justify-between gap-4">
         <select
           value={sort}
@@ -97,73 +98,73 @@ export default function HommePage() {
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
+            <option key={m} value={m}>{m}</option>
           ))}
         </select>
 
         <button
-          onClick={() => {
-            setSort("");
-            setMarqueFilter("");
-          }}
+          onClick={() => { setSort(""); setMarqueFilter(""); }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
           Réinitialiser
         </button>
       </div>
 
-      {/* PRODUITS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {loading ? (
-          <p className="text-center col-span-3">Chargement...</p>
-        ) : visibleProducts.length === 0 ? (
-          <p className="text-center col-span-3 text-gray-500">Aucun produit trouvé</p>
-        ) : (
-          visibleProducts.map((product) => (
+      {/* Produits */}
+      {loading ? (
+        <p className="text-center text-gray-600">Chargement...</p>
+      ) : visibleProducts.length === 0 ? (
+        <p className="text-center text-gray-600">Aucun produit trouvé.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {visibleProducts.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden"
+              className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition"
             >
               <img
-                src={product.imageUrl || "/images/default.jpg"}
+                src={product.imageUrl || "/placeholder.jpg"}
                 alt={product.nom}
-                className="w-full h-64 object-cover"
+                className="h-56 w-full object-cover"
               />
+
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">{product.nom}</h3>
-                <p className="text-gray-500 text-sm">{product.marque || "-"}</p>
-                <p className="text-blue-600 font-bold text-lg mt-2">{product.prix} €</p>
+                <h3 className="text-lg font-semibold">{product.nom}</h3>
+                {product.marque && (
+                  <p className="text-sm text-gray-500">{product.marque}</p>
+                )}
+                <p className="text-xl font-bold mt-2">{product.prix} €</p>
 
                 <button
                   onClick={() => addToCart(product)}
-                  className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                  className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
                 >
                   Ajouter au panier
                 </button>
               </div>
             </div>
-          ))
-        )}
-      </div>
-
-      {/* PAGINATION */}
-      {filtered.length > perPage && (
-        <div className="flex justify-center mt-10 gap-2">
-          {Array.from({ length: Math.ceil(filtered.length / perPage) }, (_, i) => i + 1).map((num) => (
-            <button
-              key={num}
-              onClick={() => setPage(num)}
-              className={`px-4 py-2 rounded-lg ${
-                page === num ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-blue-100"
-              } transition`}
-            >
-              {num}
-            </button>
           ))}
         </div>
       )}
+
+      {/* Pagination */}
+      <div className="flex justify-center mt-10 gap-4">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage((p) => p - 1)}
+          className="px-4 py-2 rounded-lg bg-gray-300 disabled:opacity-50"
+        >
+          Précédent
+        </button>
+
+        <button
+          disabled={visibleProducts.length < perPage}
+          onClick={() => setPage((p) => p + 1)}
+          className="px-4 py-2 rounded-lg bg-gray-300 disabled:opacity-50"
+        >
+          Suivant
+        </button>
+      </div>
     </main>
   );
 }
