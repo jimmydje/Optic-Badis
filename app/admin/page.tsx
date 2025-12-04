@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+
 export default function AdminPage() {
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -9,23 +13,29 @@ export default function AdminPage() {
           Tableau de bord
         </h1>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-            <h2 className="text-gray-500">Produits</h2>
-            <p className="text-3xl font-bold text-blue-600 mt-2">128</p>
-          </div>
+        
+       {/* Cards */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+    <h2 className="text-gray-500">Produits</h2>
+    <p className="text-3xl font-bold text-blue-600 mt-2">128</p>
+  </div>
 
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-            <h2 className="text-gray-500">Commandes</h2>
-            <p className="text-3xl font-bold text-green-600 mt-2">64</p>
-          </div>
+  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+    <h2 className="text-gray-500">Commandes</h2>
+    <p className="text-3xl font-bold text-green-600 mt-2">64</p>
+  </div>
 
-          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-            <h2 className="text-gray-500">Clients</h2>
-            <p className="text-3xl font-bold text-purple-600 mt-2">35</p>
-          </div>
-        </div>
+  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+    <h2 className="text-gray-500">Clients</h2>
+    <p className="text-3xl font-bold text-purple-600 mt-2">35</p>
+  </div>
+
+  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+    <h2 className="text-gray-500">Promotions</h2>
+    <p className="text-3xl font-bold text-red-600 mt-2">12</p>
+  </div>
+</div>
 
         {/* Table */}
         <div className="mt-10 bg-white p-6 rounded-xl shadow">

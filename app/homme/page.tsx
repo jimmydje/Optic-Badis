@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -21,7 +22,6 @@ export default function HommePage() {
 
   const perPage = 6;
 
-  // Charger les produits Homme depuis l’API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -38,7 +38,6 @@ export default function HommePage() {
     fetchProducts();
   }, []);
 
-  // Ajouter au panier
   const addToCart = (product: Product) => {
     const existing = localStorage.getItem("cart");
     let cart = existing ? JSON.parse(existing) : [];
@@ -71,6 +70,9 @@ export default function HommePage() {
   const visibleProducts = filtered.slice(start, start + perPage);
 
   const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
+
+  // ✅ Nouvelle pagination : nombre total de pages
+  const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
     <main className="px-6 py-12 bg-gray-50 min-h-screen">
@@ -122,14 +124,21 @@ export default function HommePage() {
               key={product.id}
               className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition"
             >
-              <img
-                src={product.imageUrl || "/placeholder.jpg"}
-                alt={product.nom}
-                className="h-56 w-full object-cover"
-              />
+              <Link href={`/homme/${product.id}`}>
+                <img
+                  src={product.imageUrl || "/placeholder.jpg"}
+                  alt={product.nom}
+                  className="h-56 w-full object-cover cursor-pointer"
+                />
+              </Link>
 
               <div className="p-4">
-                <h3 className="text-lg font-semibold">{product.nom}</h3>
+                <Link href={`/homme/${product.id}`}>
+                  <h3 className="text-lg font-semibold cursor-pointer hover:underline">
+                    {product.nom}
+                  </h3>
+                </Link>
+
                 {product.marque && (
                   <p className="text-sm text-gray-500">{product.marque}</p>
                 )}
@@ -148,22 +157,16 @@ export default function HommePage() {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-center mt-10 gap-4">
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-4 py-2 rounded-lg bg-gray-300 disabled:opacity-50"
-        >
-          Précédent
-        </button>
-
-        <button
-          disabled={visibleProducts.length < perPage}
-          onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 rounded-lg bg-gray-300 disabled:opacity-50"
-        >
-          Suivant
-        </button>
+       <div className="flex justify-center mt-10 gap-2">
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+          <button
+            key={num}
+            onClick={() => setPage(num)}
+            className={`px-4 py-2 rounded-lg ${page === num ? "bg-blue-600 text-white" : "bg-white text-gray-700 hover:bg-blue-100"} transition`}
+          >
+            {num}
+          </button>
+        ))}
       </div>
     </main>
   );

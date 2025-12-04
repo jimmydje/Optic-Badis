@@ -8,6 +8,7 @@ const links = [
   { href: "/admin/produits", label: "Produits" },
   { href: "/admin/commandes", label: "Commandes" },
   { href: "/admin/clients", label: "Clients" },
+  { href: "/admin/promotions", label: "Promotions" },
 ];
 
 export default function DashboardLayout({

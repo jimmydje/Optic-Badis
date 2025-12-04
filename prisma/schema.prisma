@@ -22,12 +22,14 @@ model Produit {
   prix           Float
   imageUrl       String?
   categorie      String?         // saisie par l'utilisateur
-  marque         String?         // ← nouveau champ
+  marque         String?         // marque du produit
   stock          Int             @default(0)
+  promotion      Int?            // nouveau champ : 20, 30, 35 ou null
   itemsCommande  CommandeItem[]  @relation("ProduitItems")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
+
 
 
 model Commande {
