@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -112,26 +113,31 @@ export default function FemmePage() {
           <p className="text-center col-span-3 text-gray-500">Aucun produit trouvé</p>
         ) : (
           visibleProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden">
-              <img
-                src={product.imageUrl || "/images/default.jpg"}
-                alt={product.nom}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">{product.nom}</h3>
-                <p className="text-gray-500 text-sm">{product.marque || "-"}</p>
-                <p className="text-blue-600 font-bold text-lg mt-2">{product.prix} €</p>
+            <Link key={product.id} href={`/femme/${product.id}`} className="block">
+              <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer">
+                <img
+                  src={product.imageUrl || "/images/default.jpg"}
+                  alt={product.nom}
+                  className="w-full h-64 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800">{product.nom}</h3>
+                  <p className="text-gray-500 text-sm">{product.marque || "-"}</p>
+                  <p className="text-blue-600 font-bold text-lg mt-2">{product.prix} €</p>
 
-                {/* Bouton Ajouter au panier */}
-                <button
-                  onClick={() => addToCart(product)}
-                  className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                >
-                  Ajouter au panier
-                </button>
+                  {/* Bouton Ajouter au panier */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault(); // empêche le clic d’ouvrir la page
+                      addToCart(product);
+                    }}
+                    className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Ajouter au panier
+                  </button>
+                </div>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>
