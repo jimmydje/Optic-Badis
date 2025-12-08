@@ -53,10 +53,16 @@ model CommandeItem {
 
 // ✅ Modèle pour gérer les utilisateurs/admins
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
+  id        String   @id @default(cuid())
+  email     String   @unique
   password  String
-  role      String  @default("user") // "admin" ou "user"
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 
