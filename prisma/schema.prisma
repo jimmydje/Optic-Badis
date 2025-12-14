@@ -21,37 +21,35 @@ model Produit {
   description    String?
   prix           Float
   imageUrl       String?
-  categorie      String?         // saisie par l'utilisateur
-  marque         String?         // marque du produit
+  categorie      String?
+  marque         String?
   stock          Int             @default(0)
-  promotion      Int?            // nouveau champ : 20, 30, 35 ou null
+  promotion      Int?
   itemsCommande  CommandeItem[]  @relation("ProduitItems")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
 
-
-
 model Commande {
-  id          String         @id @default(cuid())
-  date        DateTime       @default(now())
-  statut      String         @default("En cours")
-  total       Float
-  client      Client         @relation("ClientCommandes", fields: [clientId], references: [id], onDelete: Cascade)
-  clientId    String
-  items       CommandeItem[] @relation("CommandeItems")
+  id        String         @id @default(cuid())
+  date      DateTime       @default(now())
+  statut    String         @default("En cours")
+  total     Float
+  clientId  String
+  client    Client         @relation("ClientCommandes", fields: [clientId], references: [id], onDelete: Cascade)
+  items     CommandeItem[] @relation("CommandeItems")
 }
 
 model CommandeItem {
   id          String   @id @default(cuid())
-  commande    Commande @relation("CommandeItems", fields: [commandeId], references: [id], onDelete: Cascade)
   commandeId  String
-  produit     Produit  @relation("ProduitItems", fields: [produitId], references: [id], onDelete: Cascade)
   produitId   String
   quantite    Int
+
+  commande Commande @relation("CommandeItems", fields: [commandeId], references: [id], onDelete: Cascade)
+  produit  Produit  @relation("ProduitItems", fields: [produitId], references: [id], onDelete: Cascade)
 }
 
-// ✅ Modèle pour gérer les utilisateurs/admins
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -64,5 +62,3 @@ enum Role {
   USER
   ADMIN
 }
-
-
