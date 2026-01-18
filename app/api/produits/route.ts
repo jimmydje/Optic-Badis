@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// ✅ Catégories autorisées
+const CATEGORIES_AUTORISEES = ["Homme", "Femme", "Enfant", "Lentilles"];
+
 interface ProduitBody {
   nom: string;
   description?: string;
@@ -18,7 +21,17 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const categorie = searchParams.get("categorie");
     const sort = searchParams.get("sort");
-    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
+    const limit = searchParams.get("limit")
+      ? parseInt(searchParams.get("limit")!)
+      : undefined;
+
+    // ✅ Validation catégorie
+    if (categorie && !CATEGORIES_AUTORISEES.includes(categorie)) {
+      return NextResponse.json(
+        { error: "Catégorie invalide" },
+        { status: 400 }
+      );
+    }
 
     // Tri dynamique
     let orderBy: any = { createdAt: "desc" };
@@ -33,7 +46,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json(produits);
   } catch (error) {
-    console.error("Erreur lors du GET produits :", error);
+    console.error("Erreur GET produits :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -53,11 +66,18 @@ export async function POST(req: Request) {
       );
     }
 
+    if (categorie && !CATEGORIES_AUTORISEES.includes(categorie)) {
+      return NextResponse.json(
+        { error: "Catégorie invalide" },
+        { status: 400 }
+      );
+    }
+
     const newProduit = await prisma.produit.create({
       data: {
         nom,
         description: description || null,
-        prix: parseFloat(String(prix)),
+        prix: Number(prix),
         imageUrl: imageUrl || null,
         categorie: categorie || null,
         stock: stock ?? 0,
@@ -66,7 +86,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newProduit, { status: 201 });
   } catch (error) {
-    console.error("Erreur lors du POST produit :", error);
+    console.error("Erreur POST produit :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
@@ -88,7 +108,7 @@ export async function DELETE(req: Request) {
 
     return NextResponse.json({ message: "Produit supprimé avec succès" });
   } catch (error) {
-    console.error("Erreur lors du DELETE produit :", error);
+    console.error("Erreur DELETE produit :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

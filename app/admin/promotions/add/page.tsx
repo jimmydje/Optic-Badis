@@ -3,47 +3,43 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-interface ProduitForm {
+interface PromotionForm {
   nom: string;
   description: string;
   prix: number | "";
-  categorie: string;
+  promotion: number | "";
   imageUrl: string;
-  stock: number | "";
 }
 
-export default function AjouterProduitPage() {
+export default function AjouterPromotionPage() {
   const router = useRouter();
 
-  const [produit, setProduit] = useState<ProduitForm>({
+  const [promo, setPromo] = useState<PromotionForm>({
     nom: "",
     description: "",
     prix: "",
-    categorie: "",
+    promotion: "",
     imageUrl: "",
-    stock: "",
   });
 
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
 
-    if (name === "prix") {
-      setProduit({ ...produit, prix: value === "" ? "" : Number(value) });
-    } else if (name === "stock") {
-      setProduit({ ...produit, stock: value === "" ? "" : Number(value) });
+    if (name === "prix" || name === "promotion") {
+      setPromo({ ...promo, [name]: value === "" ? "" : Number(value) });
     } else {
-      setProduit({ ...produit, [name]: value });
+      setPromo({ ...promo, [name]: value });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!produit.nom || produit.prix === "" || !produit.categorie || produit.stock === "") {
+    if (!promo.nom || promo.prix === "" || promo.promotion === "") {
       alert("Veuillez remplir tous les champs obligatoires !");
       return;
     }
@@ -51,13 +47,13 @@ export default function AjouterProduitPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/produits", {
+      const res = await fetch("/api/promotions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...produit,
-          prix: Number(produit.prix),
-          stock: Number(produit.stock),
+          ...promo,
+          prix: Number(promo.prix),
+          promotion: Number(promo.promotion),
         }),
       });
 
@@ -66,8 +62,8 @@ export default function AjouterProduitPage() {
         throw new Error(errData.error || "Erreur API");
       }
 
-      alert("✅ Produit ajouté avec succès !");
-      router.push("/admin/produits");
+      alert("✅ Promotion ajoutée avec succès !");
+      router.push("/admin/promotions");
     } catch (err: any) {
       console.error("Erreur lors de l'ajout :", err);
       alert(`❌ Une erreur est survenue : ${err.message}`);
@@ -79,7 +75,7 @@ export default function AjouterProduitPage() {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl mx-auto mt-10">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Ajouter un produit
+        Ajouter une promotion
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -88,7 +84,7 @@ export default function AjouterProduitPage() {
           <input
             type="text"
             name="nom"
-            value={produit.nom}
+            value={promo.nom}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
             required
@@ -100,7 +96,7 @@ export default function AjouterProduitPage() {
           <input
             type="number"
             name="prix"
-            value={produit.prix}
+            value={promo.prix}
             onChange={handleChange}
             min="0"
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -109,30 +105,14 @@ export default function AjouterProduitPage() {
         </div>
 
         <div>
-          <label className="block text-gray-700 mb-1">Catégorie *</label>
-          <select
-            name="categorie"
-            value={produit.categorie}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            required
-          >
-            <option value="">-- Choisir une catégorie --</option>
-            <option value="Homme">Homme</option>
-            <option value="Femme">Femme</option>
-            <option value="Enfant">Enfant</option>
-            <option value="Lentilles">Lentilles</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-gray-700 mb-1">Stock *</label>
+          <label className="block text-gray-700 mb-1">Promotion (%) *</label>
           <input
             type="number"
-            name="stock"
-            value={produit.stock}
+            name="promotion"
+            value={promo.promotion}
             onChange={handleChange}
             min="0"
+            max="100"
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
             required
           />
@@ -143,7 +123,7 @@ export default function AjouterProduitPage() {
           <input
             type="text"
             name="imageUrl"
-            value={produit.imageUrl}
+            value={promo.imageUrl}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
           />
@@ -153,7 +133,7 @@ export default function AjouterProduitPage() {
           <label className="block text-gray-700 mb-1">Description</label>
           <textarea
             name="description"
-            value={produit.description}
+            value={promo.description}
             onChange={handleChange}
             rows={4}
             className="w-full border border-gray-300 rounded-lg px-3 py-2"
@@ -163,7 +143,7 @@ export default function AjouterProduitPage() {
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
-            onClick={() => router.push("/admin/produits")}
+            onClick={() => router.push("/admin/promotions")}
             className="px-4 py-2 rounded-lg border"
           >
             Annuler

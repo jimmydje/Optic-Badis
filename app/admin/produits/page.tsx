@@ -19,7 +19,6 @@ export default function ProduitsPage() {
   const [categorie, setCategorie] = useState("");
   const [erreur, setErreur] = useState("");
 
-  // 🔹 Charger les produits depuis l’API
   useEffect(() => {
     const fetchProduits = async () => {
       setChargement(true);
@@ -32,8 +31,6 @@ export default function ProduitsPage() {
         if (!res.ok) throw new Error("Erreur lors du chargement");
 
         const data = await res.json();
-
-        // ✅ Securité: si ce n'est pas un array, on met un tableau vide
         setProduits(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Erreur de chargement des produits :", err);
@@ -46,7 +43,6 @@ export default function ProduitsPage() {
     fetchProduits();
   }, [categorie]);
 
-  // 🔹 Supprimer un produit
   const supprimerProduit = async (id: string) => {
     if (!confirm("Voulez-vous vraiment supprimer ce produit ?")) return;
 
@@ -68,14 +64,12 @@ export default function ProduitsPage() {
     }
   };
 
-  // 🔹 Modifier un produit
   const modifierProduit = (id: string) => {
     router.push(`/admin/produits/modifier/${id}`);
   };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm">
-      {/* En-tête */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Produits</h1>
         <button
@@ -98,15 +92,12 @@ export default function ProduitsPage() {
           <option value="Homme">Homme</option>
           <option value="Femme">Femme</option>
           <option value="Enfant">Enfant</option>
+          <option value="Lentilles">Lentilles</option>
         </select>
       </div>
 
-      {/* Messages d'erreur */}
-      {erreur && (
-        <div className="mb-4 text-red-600 font-medium">{erreur}</div>
-      )}
+      {erreur && <div className="mb-4 text-red-600 font-medium">{erreur}</div>}
 
-      {/* Tableau */}
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 rounded-lg">
           <thead className="bg-gray-100 text-gray-700">

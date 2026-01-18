@@ -17,7 +17,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-xl" />
+          
           <div>
             <h1 className="text-xl font-semibold text-white">OPTIC BADIS</h1>
             <p className="text-sm text-gray-300">VOTRE VISION, NOTRE PASSION</p>

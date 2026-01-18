@@ -1,41 +1,64 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function AdminPage() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/admin/logout", { method: "POST" });
+      if (!res.ok) throw new Error("Erreur lors de la déconnexion");
+
+      router.push("/admin/login"); // redirige proprement
+    } catch (err) {
+      console.error(err);
+      alert("Impossible de se déconnecter. Réessayez.");
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
-
       {/* ----- MAIN CONTENT ----- */}
       <main className="flex-1 p-10">
 
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">
-          Tableau de bord
-        </h1>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Tableau de bord
+          </h1>
 
-        
-       {/* Cards */}
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-    <h2 className="text-gray-500">Produits</h2>
-    <p className="text-3xl font-bold text-blue-600 mt-2">128</p>
-  </div>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+          >
+            Déconnexion
+          </button>
+        </div>
 
-  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-    <h2 className="text-gray-500">Commandes</h2>
-    <p className="text-3xl font-bold text-green-600 mt-2">64</p>
-  </div>
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+            <h2 className="text-gray-500">Produits</h2>
+            <p className="text-3xl font-bold text-blue-600 mt-2">128</p>
+          </div>
 
-  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-    <h2 className="text-gray-500">Clients</h2>
-    <p className="text-3xl font-bold text-purple-600 mt-2">35</p>
-  </div>
+          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+            <h2 className="text-gray-500">Commandes</h2>
+            <p className="text-3xl font-bold text-green-600 mt-2">64</p>
+          </div>
 
-  <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
-    <h2 className="text-gray-500">Promotions</h2>
-    <p className="text-3xl font-bold text-red-600 mt-2">12</p>
-  </div>
-</div>
+          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+            <h2 className="text-gray-500">Clients</h2>
+            <p className="text-3xl font-bold text-purple-600 mt-2">35</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+            <h2 className="text-gray-500">Promotions</h2>
+            <p className="text-3xl font-bold text-red-600 mt-2">12</p>
+          </div>
+        </div>
 
         {/* Table */}
         <div className="mt-10 bg-white p-6 rounded-xl shadow">

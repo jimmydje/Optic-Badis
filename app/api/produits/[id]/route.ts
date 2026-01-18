@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// ✅ Catégories autorisées
+const CATEGORIES_AUTORISEES = ["Homme", "Femme", "Enfant", "Lentilles"];
+
 // ======================================================
 // 🔹 GET → Récupérer UN produit par ID
 // ======================================================
@@ -14,7 +17,10 @@ export async function GET(
     });
 
     if (!produit) {
-      return NextResponse.json({ error: "Produit introuvable" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Produit introuvable" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(produit);
@@ -34,12 +40,25 @@ export async function PUT(
   try {
     const body = await req.json();
 
+    if (
+      body.categorie &&
+      !CATEGORIES_AUTORISEES.includes(body.categorie)
+    ) {
+      return NextResponse.json(
+        { error: "Catégorie invalide" },
+        { status: 400 }
+      );
+    }
+
     const updated = await prisma.produit.update({
       where: { id: params.id },
       data: {
         nom: body.nom,
         description: body.description ?? null,
-        prix: body.prix !== undefined ? parseFloat(String(body.prix)) : undefined,
+        prix:
+          body.prix !== undefined
+            ? Number(body.prix)
+            : undefined,
         imageUrl: body.imageUrl ?? undefined,
         categorie: body.categorie ?? undefined,
         stock: body.stock ?? undefined,
@@ -65,7 +84,9 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    return NextResponse.json({ message: "Produit supprimé avec succès" });
+    return NextResponse.json({
+      message: "Produit supprimé avec succès",
+    });
   } catch (error) {
     console.error("Erreur DELETE produit par ID :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
