@@ -7,255 +7,182 @@ import Link from "next/link";
 interface Produit {
   id: string;
   nom: string;
-  description?: string;
-  prix?: number;
-  imageUrl?: string;
-  categorie?: string;
+  imageUrl: string;
+  categorie: "OPTIQUE" | "SOLAIRE" | "LENTILLE";
+  createdAt: string;
 }
 
-export default function Home() {
-  const [produits, setProduits] = useState<Produit[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // 🔵 État pour afficher le formulaire modal
-  const [showForm, setShowForm] = useState(false);
+export default function HomePage() {
+  const [produits, setProduits] = useState<{
+    optique?: Produit;
+    solaire?: Produit;
+    lentille?: Produit;
+  }>({});
 
   useEffect(() => {
-    async function fetchProduits() {
-      try {
-        const res = await fetch("/api/produits?limit=3");
-        const data = await res.json();
-
-        // 🔹 Assure-toi que data est bien un tableau
-        if (Array.isArray(data)) {
-          setProduits(data);
-        } else if (Array.isArray(data.produits)) {
-          setProduits(data.produits);
-        } else {
-          setProduits([]);
-        }
-      } catch (error) {
-        console.error("Erreur en récupérant les produits :", error);
-        setProduits([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProduits();
+    fetch("/api/products/last-by-category")
+      .then((res) => res.json())
+      .then((data) => setProduits(data));
   }, []);
 
-  const placeholderProduits = [1, 2, 3];
-
-  // 🔵 Fonction d’envoi du formulaire
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
-    const formData = {
-      nom: e.target.nom.value,
-      email: e.target.email.value,
-      message: e.target.message.value,
-    };
-
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (res.ok) {
-      alert("Votre message a été envoyé !");
-      setShowForm(false);
-    } else {
-      alert("Erreur lors de l’envoi.");
-    }
-  };
-
   return (
-    <main className="text-gray-900">
-
-      {/* 1ère partie */}
-      <section className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] flex items-center justify-start bg-gray-100">
+    <div className="w-full text-white">
+      {/* HERO */}
+      <section className="relative h-[90vh] flex items-center justify-center text-center overflow-hidden">
         <Image
           src="/images/image1.jpg"
-          alt="femme avec lunettes"
+          alt="Badis Optic"
           fill
+          priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="relative z-10 max-w-2xl px-4 sm:px-6 md:px-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-            The perfect <br /> Look
+
+        <div className="absolute inset-0 bg-black/60" />
+
+        <div className="relative z-10 max-w-3xl px-6">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            Une vision claire, un style affirmé
           </h1>
-          <p className="text-white mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">
-            Our sunglasses are designed to protect your eyes both from excessive
-            light and harmful UV rays.
+
+          <p className="mt-6 text-lg text-neutral-200">
+            Badis Optic vous accompagne avec des solutions optiques modernes,
+            élégantes et adaptées à votre quotidien.
           </p>
+
+          <Link href="/collections">
+            <button className="mt-10 px-8 py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
+              Découvrir nos collections
+            </button>
+          </Link>
         </div>
       </section>
 
-      {/* Nouveautés */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-6 bg-white">
-        <h2 className="text-2xl sm:text-3xl md:text-3xl font-semibold text-center text-gray-800 mb-8 sm:mb-10">
-          Nouveautés
-        </h2>
+      {/* HISTOIRE */}
+      <section className="py-24 px-6 bg-neutral-900">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14 items-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-semibold mb-6">
+              Notre histoire
+            </h2>
+            <p className="text-neutral-300 leading-relaxed">
+              Badis Optic est né d’une passion pour la vision et le détail.
+              Depuis nos débuts à Annaba, nous mettons notre expertise au
+              service de votre confort visuel et de votre style.
+            </p>
+            <p className="text-neutral-300 mt-4 leading-relaxed">
+              Chaque monture est sélectionnée avec soin pour allier
+              performance, esthétique et durabilité.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
-          {loading
-            ? placeholderProduits.map((i) => (
-                <div
-                  key={i}
-                  className="rounded-2xl overflow-hidden shadow-md animate-pulse bg-gray-200"
-                >
-                  <div className="w-full h-48 sm:h-56 md:h-64 bg-gray-300" />
-                  <div className="p-4 space-y-2">
-                    <div className="h-5 sm:h-6 bg-gray-300 rounded w-3/4" />
-                    <div className="h-4 bg-gray-300 rounded w-1/2" />
-                    <div className="h-5 bg-gray-300 rounded w-1/4 mt-2" />
-                  </div>
-                </div>
-              ))
-            : Array.isArray(produits) && produits.length > 0
-              ? produits.map((produit) => (
-                  <div
-                    key={produit.id}
-                    className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
-                  >
-                    <img
-                      src={produit.imageUrl || "/placeholder.jpg"}
-                      alt={produit.nom}
-                      className="w-full h-48 sm:h-56 md:h-64 object-cover"
-                    />
-                    <div className="p-4 space-y-2">
-                      <h3 className="font-semibold text-base sm:text-lg md:text-lg">
-                        {produit.nom}
-                      </h3>
-                      {produit.description && (
-                        <p className="text-gray-600 text-xs sm:text-sm md:text-sm">
-                          {produit.description}
-                        </p>
-                      )}
-                      {produit.prix !== undefined && (
-                        <p className="text-blue-600 font-bold text-sm sm:text-base md:text-base">
-                          {produit.prix} DA
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))
-              : <p className="text-center col-span-full">Aucun produit trouvé.</p>
-          }
-        </div>
-      </section>
-
-      {/* Promo */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-6 bg-blue-50">
-        <h2 className="text-2xl sm:sm:text-3xl md:text-3xl font-semibold text-center text-gray-800 mb-8 sm:mb-10">
-          Offres et Promotions
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
-          {["Pack Découverte", "Pack Premium", "Pack Luxe"].map((pack, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition"
-            >
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600 mb-2">
-                {pack}
-              </h3>
-              <p className="text-gray-600 mb-4 text-sm sm:text-base md:text-base">
-                sur toutes les montures {idx === 0 ? "classiques" : idx === 1 ? "modernes" : "haut de gamme"}
-              </p>
-              <div className="text-3xl sm:text-4xl md:text-4xl font-extrabold text-red-500 mb-4">
-                {idx === 0 ? "-20%" : idx === 1 ? "-30%" : "-35%"}
-              </div>
-
-              <Link href="/promotions">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                  Profiter
-                </button>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 md:px-6 bg-gray-100 text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-3xl font-bold mb-6 text-blue-700">
-          Contact
-        </h2>
-        <p className="max-w-xl mx-auto mb-6 sm:mb-8 text-gray-700 text-sm sm:text-base md:text-base">
-          Une question ? Besoin d’un conseil ? Contactez-nous ou passez à la boutique.
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-700 text-sm sm:text-base"
-          >
-            Envoyer un e-mail
-          </button>
-
-          <a
-            href="tel:+213555555555"
-            className="border border-blue-600 text-blue-600 px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-50 text-sm sm:text-base"
-          >
-            +213-657-411-145
-          </a>
-        </div>
-      </section>
-
-      {/* 🔵 FORMULAIRE MODAL */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center p-4 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4 text-center">Envoyer un message</h3>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                name="nom"
-                placeholder="Votre nom"
-                className="w-full p-2 border rounded"
-                required
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Votre e-mail"
-                className="w-full p-2 border rounded"
-                required
-              />
-
-              <textarea
-                name="message"
-                placeholder="Votre message"
-                className="w-full p-2 border rounded h-28"
-                required
-              />
-
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-4 py-2 border rounded"
-                >
-                  Annuler
-                </button>
-
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Envoyer
-                </button>
-              </div>
-            </form>
+          <div className="relative h-80 rounded-3xl overflow-hidden">
+            <Image
+              src="/images/image1.jpg"
+              alt="Boutique Badis Optic"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
-      )}
+      </section>
 
-    </main>
+      {/* NOS COLLECTIONS (DYNAMIQUE) */}
+      <section className="py-24 px-6 bg-neutral-950">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-semibold text-center mb-14">
+            Nos collections
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+            {produits.optique && (
+              <Link href={`/produit/${produits.optique.id}`}>
+                <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
+                  <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
+                    <Image
+                      src={produits.optique.imageUrl}
+                      alt={produits.optique.nom}
+                      fill
+                      className="object-cover group-hover:scale-105 transition"
+                    />
+                  </div>
+                  <h3 className="text-xl font-medium">Optique</h3>
+                  <p className="text-neutral-400 text-sm mt-2">
+                    {produits.optique.nom}
+                  </p>
+                </div>
+              </Link>
+            )}
+
+            {produits.solaire && (
+              <Link href={`/produit/${produits.solaire.id}`}>
+                <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
+                  <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
+                    <Image
+                      src={produits.solaire.imageUrl}
+                      alt={produits.solaire.nom}
+                      fill
+                      className="object-cover group-hover:scale-105 transition"
+                    />
+                  </div>
+                  <h3 className="text-xl font-medium">Solaire</h3>
+                  <p className="text-neutral-400 text-sm mt-2">
+                    {produits.solaire.nom}
+                  </p>
+                </div>
+              </Link>
+            )}
+
+            {produits.lentille && (
+              <Link href={`/produit/${produits.lentille.id}`}>
+                <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
+                  <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
+                    <Image
+                      src={produits.lentille.imageUrl}
+                      alt={produits.lentille.nom}
+                      fill
+                      className="object-cover group-hover:scale-105 transition"
+                    />
+                  </div>
+                  <h3 className="text-xl font-medium">Lentilles</h3>
+                  <p className="text-neutral-400 text-sm mt-2">
+                    {produits.lentille.nom}
+                  </p>
+                </div>
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section className="py-24 px-6 bg-neutral-900">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-6">
+            Contactez-nous
+          </h2>
+          <p className="text-neutral-300 mb-14">
+            Notre équipe est à votre écoute pour vous conseiller et vous
+            accompagner.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-neutral-300">
+            <div>
+              <h4 className="text-white font-medium mb-2">Adresse</h4>
+              <p>Annaba, Algérie</p>
+            </div>
+
+            <div>
+              <h4 className="text-white font-medium mb-2">Téléphone</h4>
+              <p>+213 550 35 27 02</p>
+            </div>
+
+            <div>
+              <h4 className="text-white font-medium mb-2">Horaires</h4>
+              <p>Sam – Jeu : 9h à 20h</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
