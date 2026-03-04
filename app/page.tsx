@@ -7,22 +7,40 @@ import Link from "next/link";
 interface Produit {
   id: string;
   nom: string;
-  imageUrl: string;
-  categorie: "OPTIQUE" | "SOLAIRE" | "LENTILLE";
+  imageUrl: string | null;
+  categorie: string | null;
   createdAt: string;
 }
 
 export default function HomePage() {
-  const [produits, setProduits] = useState<{
-    optique?: Produit;
-    solaire?: Produit;
-    lentille?: Produit;
-  }>({});
+  const [produits, setProduits] = useState<Produit[]>([]);
+
+  // 🔒 Sécurise les images pour éviter erreur Next/Image
+  const getImageSrc = (url: string | null) => {
+    if (!url) return "/images/image1.jpg";
+
+    if (url.startsWith("/")) return url;
+
+    if (url.startsWith("http")) return url;
+
+    return "/images/image1.jpg";
+  };
 
   useEffect(() => {
-    fetch("/api/products/last-by-category")
+    fetch("/api/produits?limit=3")
       .then((res) => res.json())
-      .then((data) => setProduits(data));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setProduits(data);
+        } else {
+          console.error("API n'a pas renvoyé un tableau :", data);
+          setProduits([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Erreur chargement produits :", err);
+        setProduits([]);
+      });
   }, []);
 
   return (
@@ -86,71 +104,43 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* NOS COLLECTIONS (DYNAMIQUE) */}
+      {/* NOUVEAUTÉS */}
       <section className="py-24 px-6 bg-neutral-950">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-semibold text-center mb-14">
-            Nos collections
+            Nouveautés
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-            {produits.optique && (
-              <Link href={`/produit/${produits.optique.id}`}>
-                <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
-                  <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
-                    <Image
-                      src={produits.optique.imageUrl}
-                      alt={produits.optique.nom}
-                      fill
-                      className="object-cover group-hover:scale-105 transition"
-                    />
-                  </div>
-                  <h3 className="text-xl font-medium">Optique</h3>
-                  <p className="text-neutral-400 text-sm mt-2">
-                    {produits.optique.nom}
-                  </p>
-                </div>
-              </Link>
-            )}
+          {produits.length === 0 ? (
+            <p className="text-center text-neutral-400">
+              Aucun produit récent
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+              {produits.map((produit) => (
+                <Link key={produit.id} href={`/produit/${produit.id}`}>
+                  <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
+                    <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
+                      <Image
+                        src={getImageSrc(produit.imageUrl)}
+                        alt={produit.nom}
+                        fill
+                        className="object-cover group-hover:scale-105 transition duration-300"
+                      />
+                    </div>
 
-            {produits.solaire && (
-              <Link href={`/produit/${produits.solaire.id}`}>
-                <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
-                  <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
-                    <Image
-                      src={produits.solaire.imageUrl}
-                      alt={produits.solaire.nom}
-                      fill
-                      className="object-cover group-hover:scale-105 transition"
-                    />
-                  </div>
-                  <h3 className="text-xl font-medium">Solaire</h3>
-                  <p className="text-neutral-400 text-sm mt-2">
-                    {produits.solaire.nom}
-                  </p>
-                </div>
-              </Link>
-            )}
+                    <h3 className="text-xl font-medium">
+                      {produit.categorie || "Produit"}
+                    </h3>
 
-            {produits.lentille && (
-              <Link href={`/produit/${produits.lentille.id}`}>
-                <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
-                  <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
-                    <Image
-                      src={produits.lentille.imageUrl}
-                      alt={produits.lentille.nom}
-                      fill
-                      className="object-cover group-hover:scale-105 transition"
-                    />
+                    <p className="text-neutral-400 text-sm mt-2">
+                      {produit.nom}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-medium">Lentilles</h3>
-                  <p className="text-neutral-400 text-sm mt-2">
-                    {produits.lentille.nom}
-                  </p>
-                </div>
-              </Link>
-            )}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

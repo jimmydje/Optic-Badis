@@ -21,6 +21,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const categorie = searchParams.get("categorie");
     const sort = searchParams.get("sort");
+    const search = searchParams.get("search"); // ✅ Recherche ajoutée
     const limit = searchParams.get("limit")
       ? parseInt(searchParams.get("limit")!)
       : undefined;
@@ -33,13 +34,37 @@ export async function GET(req: Request) {
       );
     }
 
-    // Tri dynamique
+    // 🔹 Tri dynamique
     let orderBy: any = { createdAt: "desc" };
     if (sort === "prix-asc") orderBy = { prix: "asc" };
     if (sort === "prix-desc") orderBy = { prix: "desc" };
 
+    // 🔹 WHERE dynamique (categorie + search)
+    let where: any = {};
+
+    if (categorie) {
+      where.categorie = categorie;
+    }
+
+    if (search) {
+      where.OR = [
+        {
+          nom: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          description: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
+
     const produits = await prisma.produit.findMany({
-      where: categorie ? { categorie } : {},
+      where,
       orderBy,
       take: limit,
     });

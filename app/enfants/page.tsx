@@ -21,7 +21,6 @@ export default function EnfantsPage() {
   const [marqueFilter, setMarqueFilter] = useState("");
 
   const perPage = 6;
-  const totalPages = 12;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -56,38 +55,41 @@ export default function EnfantsPage() {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`✅ ${product.nom} a été ajouté au panier !`);
+    alert(`✅ ${product.nom} ajouté au panier`);
   };
 
-  // TRI & FILTRE
+  // Filtres & tri
   let filtered = [...products];
   if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
+
   if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
   if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
   if (sort === "date-new")
-    filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+    filtered.sort(
+      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+    );
 
-  // PAGINATION
   const start = (page - 1) * perPage;
-  const end = start + perPage;
-  const visibleProducts = filtered.slice(start, end);
-
-  const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
+  const visibleProducts = filtered.slice(start, start + perPage);
+  const marques = Array.from(
+    new Set(products.map((p) => p.marque).filter(Boolean))
+  );
+  const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
-    <main className="px-6 py-12 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-semibold text-center text-gray-800 mb-10">
-        Collection Enfants 🕶️
+    <main className="min-h-screen bg-neutral-950 text-white px-6 py-20">
+      <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
+        Collection Enfants
       </h1>
 
-      {/* Filtres */}
-      <div className="max-w-6xl mx-auto mb-8 flex flex-col md:flex-row justify-between gap-4">
+      {/* FILTRES */}
+      <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row gap-4 justify-between">
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="border rounded-lg px-4 py-2"
+          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 text-white"
         >
-          <option value="">Trier par...</option>
+          <option value="">Trier par</option>
           <option value="price-asc">Prix croissant</option>
           <option value="price-desc">Prix décroissant</option>
           <option value="date-new">Nouveautés</option>
@@ -96,13 +98,11 @@ export default function EnfantsPage() {
         <select
           value={marqueFilter}
           onChange={(e) => setMarqueFilter(e.target.value)}
-          className="border rounded-lg px-4 py-2"
+          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 text-white"
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
+            <option key={m} value={m}>{m}</option>
           ))}
         </select>
 
@@ -111,63 +111,71 @@ export default function EnfantsPage() {
             setSort("");
             setMarqueFilter("");
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          className="px-6 py-3 rounded-xl bg-white text-black hover:bg-neutral-200 transition"
         >
           Réinitialiser
         </button>
       </div>
 
-      {/* Produits */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {loading ? (
-          <p className="text-center col-span-3">Chargement...</p>
-        ) : visibleProducts.length === 0 ? (
-          <p className="text-center col-span-3 text-gray-500">
-            Aucun produit trouvé
-          </p>
-        ) : (
-          visibleProducts.map((product) => (
-            <Link
+      {/* PRODUITS */}
+      {loading ? (
+        <p className="text-center text-neutral-400">Chargement...</p>
+      ) : visibleProducts.length === 0 ? (
+        <p className="text-center text-neutral-400">Aucun produit trouvé.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+          {visibleProducts.map((product) => (
+            <div
               key={product.id}
-              href={`/enfants/${product.id}`}
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden block"
+              className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
             >
-              <img
-                src={product.imageUrl || "/images/default.jpg"}
-                alt={product.nom}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">{product.nom}</h3>
-                <p className="text-gray-500 text-sm">{product.marque || "-"}</p>
-                <p className="text-blue-600 font-bold text-lg mt-2">{product.prix} €</p>
+              <Link href={`/enfants/${product.id}`}>
+                <img
+                  src={product.imageUrl || "/images/default.jpg"}
+                  alt={product.nom}
+                  className="h-64 w-full object-cover group-hover:scale-105 transition"
+                />
+              </Link>
 
-                {/* Bouton Ajouter au panier (clic indépendant) */}
+              <div className="p-6">
+                <Link href={`/enfants/${product.id}`}>
+                  <h3 className="text-lg font-medium hover:underline">
+                    {product.nom}
+                  </h3>
+                </Link>
+
+                {product.marque && (
+                  <p className="text-sm text-neutral-400 mt-1">
+                    {product.marque}
+                  </p>
+                )}
+
+                <p className="text-xl font-semibold mt-3">
+                  {product.prix} €
+                </p>
+
                 <button
-                  onClick={(e) => {
-                    e.preventDefault(); // empêche l’ouverture du lien
-                    addToCart(product);
-                  }}
-                  className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                  onClick={() => addToCart(product)}
+                  className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition"
                 >
                   Ajouter au panier
                 </button>
               </div>
-            </Link>
-          ))
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-10 gap-2">
+      {/* PAGINATION */}
+      <div className="flex justify-center mt-16 gap-2">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
           <button
             key={num}
             onClick={() => setPage(num)}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-4 py-2 rounded-full ${
               page === num
-                ? "bg-blue-600 text-white"
-                : "bg-white text-gray-700 hover:bg-blue-100"
+                ? "bg-white text-black"
+                : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
             } transition`}
           >
             {num}

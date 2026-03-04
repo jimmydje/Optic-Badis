@@ -2,17 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* === Thème clair par défaut === */
+/* ============================= */
+/*        THÈME CLAIR            */
+/* ============================= */
+
 :root {
-  /* Fond légèrement bleuté */
-  --background: #f5f8ff;
-  /* Texte principal (gris foncé, pas noir pur) */
-  --foreground: #1a1a1a;
-  /* Accent principal (bleu doux pour boutons, liens, etc.) */
-  --accent: #2563eb;
+  --background: #f5f8ff;     /* Fond légèrement bleuté */
+  --foreground: #1a1a1a;     /* Texte principal */
+  --accent: #2563eb;         /* Accent bleu pour boutons si besoin */
 }
 
-/* === Application du thème global === */
+/* ============================= */
+/*      STYLE GLOBAL BODY        */
+/* ============================= */
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -21,16 +24,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* === Liens === */
+/* ============================= */
+/*           LIENS               */
+/* ============================= */
+
+/* ❌ On ne force PLUS la couleur */
 a {
-  color: var(--accent);
   text-decoration: none;
+  transition: 0.2s ease;
 }
+
+/* Hover simple */
 a:hover {
   text-decoration: underline;
 }
 
-/* === Thème sombre automatique === */
+/* ============================= */
+/*        THÈME SOMBRE           */
+/* ============================= */
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0b0b0b;
