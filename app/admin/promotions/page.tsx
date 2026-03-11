@@ -66,63 +66,94 @@ export default function PromotionsPage() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 bg-gray-50 rounded-lg shadow-sm text-gray-900">
+      
+      {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Promotions</h1>
+        <h1 className="text-2xl font-bold">Promotions</h1>
+
         <button
-          onClick={() => router.push("/admin/promotions/ajouter")}
+          onClick={() => router.push("/admin/promotions/add")}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
         >
           + Ajouter une promotion
         </button>
       </div>
 
-      {error && <div className="mb-4 text-red-600 font-medium">{error}</div>}
+      {error && (
+        <div className="mb-4 text-red-600 font-medium">
+          {error}
+        </div>
+      )}
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 rounded-lg">
-          <thead className="bg-gray-100 text-gray-700">
+      {/* TABLE */}
+      <div className="overflow-x-auto bg-white rounded-lg shadow">
+        <table className="min-w-full border border-gray-200">
+
+          <thead className="bg-gray-200 text-gray-900">
             <tr>
-              <th className="py-2 px-4 text-left">Nom</th>
-              <th className="py-2 px-4 text-left">Description</th>
-              <th className="py-2 px-4 text-left">Prix</th>
-              <th className="py-2 px-4 text-left">Promo</th>
-              <th className="py-2 px-4 text-left">Prix final</th>
-              <th className="py-2 px-4 text-center">Actions</th>
+              <th className="py-3 px-4 text-left">Nom</th>
+              <th className="py-3 px-4 text-left">Description</th>
+              <th className="py-3 px-4 text-left">Prix</th>
+              <th className="py-3 px-4 text-left">Promo</th>
+              <th className="py-3 px-4 text-left">Prix final</th>
+              <th className="py-3 px-4 text-center">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="text-center py-4">
+                <td colSpan={6} className="text-center py-6">
                   Chargement...
                 </td>
               </tr>
+
             ) : promotions.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-4 text-gray-500">
+                <td colSpan={6} className="text-center py-6 text-gray-500">
                   Aucune promotion trouvée
                 </td>
               </tr>
+
             ) : (
               promotions.map((promo) => {
-                const prixFinal = promo.prix - (promo.prix * promo.promotion) / 100;
+                const prixFinal =
+                  promo.prix - (promo.prix * promo.promotion) / 100;
 
                 return (
-                  <tr key={promo.id} className="border-t hover:bg-gray-50">
-                    <td className="py-2 px-4">{promo.nom}</td>
-                    <td className="py-2 px-4">{promo.description || "-"}</td>
-                    <td className="py-2 px-4">{promo.prix} DA</td>
-                    <td className="py-2 px-4">-{promo.promotion}%</td>
-                    <td className="py-2 px-4 font-bold">{prixFinal.toFixed(2)} DA</td>
-                    <td className="py-2 px-4 text-center space-x-2">
+                  <tr
+                    key={promo.id}
+                    className="border-t hover:bg-gray-100 transition"
+                  >
+                    <td className="py-3 px-4 font-medium">
+                      {promo.nom}
+                    </td>
+
+                    <td className="py-3 px-4">
+                      {promo.description || "-"}
+                    </td>
+
+                    <td className="py-3 px-4">
+                      {promo.prix} DA
+                    </td>
+
+                    <td className="py-3 px-4 text-red-600 font-semibold">
+                      -{promo.promotion}%
+                    </td>
+
+                    <td className="py-3 px-4 font-bold text-green-600">
+                      {prixFinal.toFixed(2)} DA
+                    </td>
+
+                    <td className="py-3 px-4 text-center space-x-3">
                       <button
                         onClick={() => editPromotion(promo.id)}
                         className="text-blue-600 hover:underline"
                       >
                         Modifier
                       </button>
+
                       <button
                         onClick={() => deletePromotion(promo.id)}
                         className="text-red-600 hover:underline"
@@ -135,8 +166,10 @@ export default function PromotionsPage() {
               })
             )}
           </tbody>
+
         </table>
       </div>
+
     </div>
   );
 }

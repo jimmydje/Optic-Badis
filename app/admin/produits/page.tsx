@@ -69,9 +69,9 @@ export default function ProduitsPage() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 bg-white rounded-lg shadow-sm text-black">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Produits</h1>
+        <h1 className="text-2xl font-bold">Produits</h1>
         <button
           onClick={() => router.push("/admin/produits/add")}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -86,7 +86,7 @@ export default function ProduitsPage() {
         <select
           value={categorie}
           onChange={(e) => setCategorie(e.target.value)}
-          className="border border-gray-300 rounded px-2 py-1"
+          className="border border-black rounded px-2 py-1"
         >
           <option value="">Toutes</option>
           <option value="Homme">Homme</option>
@@ -100,7 +100,7 @@ export default function ProduitsPage() {
 
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 rounded-lg">
-          <thead className="bg-gray-100 text-gray-700">
+          <thead className="bg-gray-100 text-black">
             <tr>
               <th className="py-2 px-4 text-left">Nom</th>
               <th className="py-2 px-4 text-left">Description</th>
@@ -111,7 +111,7 @@ export default function ProduitsPage() {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="text-black">
             {chargement ? (
               <tr>
                 <td colSpan={6} className="text-center py-4">

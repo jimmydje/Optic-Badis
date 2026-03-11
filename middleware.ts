@@ -1,30 +1,35 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export function middleware(req: NextRequest) {
+  const url = req.nextUrl.clone();
 
-  // ✅ Autoriser la page de login admin
-  if (pathname.startsWith("/admin/login")) {
-    return NextResponse.next();
-  }
+  // On ne protège que /admin
+  if (url.pathname.startsWith("/admin")) {
+    const token = req.cookies.get("token")?.value;
 
-  // 🔐 Protéger tout /admin
-  if (pathname.startsWith("/admin")) {
-    const token = request.cookies.get("admin_token");
-
-    // ❌ Pas connecté → retour login
     if (!token) {
-      return NextResponse.redirect(
-        new URL("/admin/login", request.url)
-      );
+      url.pathname = "/auth"; // redirection si pas logué
+      return NextResponse.redirect(url);
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { role: string };
+      if (decoded.role !== "ADMIN") {
+        url.pathname = "/"; // redirection si pas admin
+        return NextResponse.redirect(url);
+      }
+    } catch {
+      url.pathname = "/auth";
+      return NextResponse.redirect(url);
     }
   }
 
   return NextResponse.next();
 }
 
-// 👇 Appliquer seulement sur /admin
+// Appliquer le middleware sur /admin
 export const config = {
   matcher: ["/admin/:path*"],
 };

@@ -63,9 +63,10 @@ export default function ClientsPage() {
   }
 
   return (
-    <div>
+    <div className="text-black">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">Clients</h1>
+        <h1 className="text-2xl font-semibold">Clients</h1>
+
         <button
           onClick={() => router.push("/admin/clients/add")}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
@@ -78,9 +79,9 @@ export default function ClientsPage() {
         {clients.length === 0 ? (
           <p className="text-center text-gray-500">Aucun client trouvé.</p>
         ) : (
-          <table className="w-full border-collapse text-left">
+          <table className="w-full border-collapse text-left text-black">
             <thead>
-              <tr className="border-b text-gray-600">
+              <tr className="border-b bg-gray-100 text-black">
                 <th className="py-2 px-3">Nom</th>
                 <th className="py-2 px-3">Email</th>
                 <th className="py-2 px-3">Téléphone</th>
@@ -89,23 +90,33 @@ export default function ClientsPage() {
                 <th className="py-2 px-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody>
+
+            <tbody className="text-black">
               {clients.map((c) => (
                 <tr key={c.id} className="border-b hover:bg-gray-50 transition">
-                  <td className="py-2 px-3 font-medium text-gray-800">
+                  <td className="py-2 px-3 font-medium">
                     {c.nom || "—"}
                   </td>
-                  <td className="py-2 px-3">{c.email || "—"}</td>
-                  <td className="py-2 px-3">{c.telephone || "—"}</td>
+
+                  <td className="py-2 px-3">
+                    {c.email || "—"}
+                  </td>
+
+                  <td className="py-2 px-3">
+                    {c.telephone || "—"}
+                  </td>
+
                   <td className="py-2 px-3">
                     {c.commandes?.length || 0}
                   </td>
+
                   <td className="py-2 px-3">
                     {c.createdAt
                       ? new Date(c.createdAt).toLocaleDateString("fr-FR")
                       : "—"}
                   </td>
-                  <td className="py-2 px-3 text-center space-x-2">
+
+                  <td className="py-2 px-3 text-center space-x-3">
                     <button
                       onClick={() =>
                         router.push(`/admin/clients/${c.id}/edit`)
@@ -114,6 +125,7 @@ export default function ClientsPage() {
                     >
                       Modifier
                     </button>
+
                     <button
                       onClick={() => handleDelete(c.id)}
                       className="text-red-600 hover:underline"

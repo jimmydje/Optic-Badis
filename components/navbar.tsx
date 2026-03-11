@@ -11,6 +11,11 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
+  // ❌ Ne pas afficher la navbar dans /admin
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
@@ -61,7 +66,7 @@ export default function Navbar() {
             Lentilles
           </Link>
 
-          {/* Barre de recherche blanche */}
+          {/* Barre de recherche */}
           <form
             onSubmit={handleSearch}
             className="flex items-center bg-white rounded-xl px-3 py-2 shadow-sm"
@@ -88,6 +93,14 @@ export default function Navbar() {
           >
             <ShoppingCart size={18} className="text-white" />
             Panier
+          </Link>
+
+          {/* Sign in / Sign up */}
+          <Link
+            href="/auth"
+            className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e] transition"
+          >
+            Sign in / Sign up
           </Link>
         </div>
 
@@ -144,6 +157,15 @@ export default function Navbar() {
           >
             <ShoppingCart size={18} className="text-white" />
             Panier
+          </Link>
+
+          {/* Sign in / Sign up mobile */}
+          <Link
+            href="/auth"
+            onClick={() => setMobileOpen(false)}
+            className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium text-center"
+          >
+            Sign in / Sign up
           </Link>
         </div>
       )}

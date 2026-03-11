@@ -34,7 +34,6 @@ export default function CommandesPage() {
 
       if (!res.ok) throw new Error("Erreur lors de la mise à jour du statut");
 
-      // Mettre à jour localement sans recharger
       setCommandes((prev) =>
         prev.map((cmd) =>
           cmd.id === id ? { ...cmd, statut: newStatut } : cmd
@@ -53,32 +52,40 @@ export default function CommandesPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">Commandes</h1>
+    <div className="text-black">
+      <h1 className="text-2xl font-semibold mb-6">Commandes</h1>
 
       <div className="bg-white p-6 rounded-xl shadow">
         {commandes.length === 0 ? (
-          <p className="text-gray-500 text-center">Aucune commande pour le moment.</p>
+          <p className="text-gray-500 text-center">
+            Aucune commande pour le moment.
+          </p>
         ) : (
-          <table className="w-full border-collapse text-left">
+          <table className="w-full border-collapse text-left text-black">
             <thead>
-              <tr className="border-b text-gray-600">
+              <tr className="border-b bg-gray-100 text-black">
                 <th className="py-2 px-3">Client</th>
                 <th className="py-2 px-3">Date</th>
                 <th className="py-2 px-3">Montant</th>
                 <th className="py-2 px-3">Statut</th>
               </tr>
             </thead>
-            <tbody>
+
+            <tbody className="text-black">
               {commandes.map((cmd) => (
                 <tr key={cmd.id} className="border-b hover:bg-gray-50 transition">
                   <td className="py-2 px-3">{cmd.client?.nom || "—"}</td>
+
                   <td className="py-2 px-3">
                     {cmd.date
                       ? new Date(cmd.date).toLocaleDateString("fr-FR")
                       : "—"}
                   </td>
-                  <td className="py-2 px-3">{cmd.total?.toLocaleString()} DA</td>
+
+                  <td className="py-2 px-3">
+                    {cmd.total?.toLocaleString()} DA
+                  </td>
+
                   <td className="py-2 px-3">
                     <select
                       value={cmd.statut}

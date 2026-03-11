@@ -75,21 +75,21 @@ export default function LentilleDetailPage() {
 
         {/* PRIX */}
         <div className="flex items-center gap-4">
-          <p className="text-3xl font-bold text-green-600">{product.prix} DA</p>
-          <p className="text-xl line-through text-gray-400">DA 6,200.00</p>
+          <p className="text-3xl font-bold text-white">{product.prix} DA</p>
+          <p className="text-xl line-through text-white">DA 6,200.00</p>
 
-          <span className="bg-green-600 text-white text-sm px-3 py-1 rounded-full">
+          <span className="bg-[#DAAB3A] text-white text-sm px-3 py-1 rounded-full">
             PROMO - DA 400
           </span>
         </div>
 
         {/* Badge */}
-        <div className="bg-blue-100 text-blue-600 border border-blue-300 px-4 py-2 rounded-lg w-fit font-medium">
+        <div className="bg-red-100 text-red-600 border border-red-300 px-4 py-2 rounded-lg w-fit font-medium">
           👁️ Lentilles certifiées & sécurisées
         </div>
 
         {/* AVANTAGES LENTILLES */}
-        <ul className="list-disc pl-5 space-y-1 text-gray-700">
+        <ul className="list-disc pl-5 space-y-1 text-white">
           <li>Confort longue durée</li>
           <li>Hydratation optimale</li>
           <li>Vision nette et stable</li>
@@ -99,13 +99,13 @@ export default function LentilleDetailPage() {
         </ul>
 
         {/* ---- BOUTON BLEU ---- */}
-        <button className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg shadow-md hover:bg-blue-700 transition">
+        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md  transition">
           Ajouter au panier
         </button>
 
         {/* DESCRIPTION */}
         {product.description && (
-          <div className="pt-4 text-gray-700">
+          <div className="pt-4 text-white">
             <h2 className="text-xl font-semibold mb-2">Description</h2>
             <p>{product.description}</p>
           </div>
