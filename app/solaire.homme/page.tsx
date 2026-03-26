@@ -5,15 +5,15 @@ import Link from "next/link";
 
 interface Product {
   id: string;
-  images: string[]; // tableau d’images
+  images: string[];
   nom: string;
   marque?: string;
   prix: number;
   categorie?: string;
-  createdAt: string;
+  createdAt: string; 
 }
 
-export default function HommePage() {
+export default function SolaireHommePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -25,7 +25,8 @@ export default function HommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Homme");
+        // ✅ FIX catégorie
+        const res = await fetch("/api/produits?categorie=Solaire Homme");
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
         setProducts(data);
@@ -37,6 +38,11 @@ export default function HommePage() {
     };
     fetchProducts();
   }, []);
+
+  // ✅ reset page si filtre change
+  useEffect(() => {
+    setPage(1);
+  }, [sort, marqueFilter]);
 
   const addToCart = (product: Product) => {
     const existing = localStorage.getItem("cart");
@@ -59,20 +65,26 @@ export default function HommePage() {
   };
 
   let filtered = [...products];
+
   if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
   if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
   if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
-  if (sort === "date-new") filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  if (sort === "date-new")
+    filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
-  const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
+
+  const marques = Array.from(
+    new Set(products.map((p) => p.marque).filter(Boolean))
+  );
+
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white px-6 py-20">
       <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
-        Collection Homme
+        Lunettes Solaires Homme
       </h1>
 
       {/* FILTRES */}
@@ -80,7 +92,7 @@ export default function HommePage() {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 text-white"
+          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3"
         >
           <option value="">Trier par</option>
           <option value="price-asc">Prix croissant</option>
@@ -91,7 +103,7 @@ export default function HommePage() {
         <select
           value={marqueFilter}
           onChange={(e) => setMarqueFilter(e.target.value)}
-          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 text-white"
+          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3"
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
@@ -100,8 +112,11 @@ export default function HommePage() {
         </select>
 
         <button
-          onClick={() => { setSort(""); setMarqueFilter(""); }}
-          className="px-6 py-3 rounded-xl bg-white text-black hover:bg-neutral-200 transition"
+          onClick={() => {
+            setSort("");
+            setMarqueFilter("");
+          }}
+          className="px-6 py-3 rounded-xl bg-white text-black hover:bg-neutral-200"
         >
           Réinitialiser
         </button>
@@ -119,17 +134,17 @@ export default function HommePage() {
               key={product.id}
               className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
             >
-              <Link href={`/homme/${product.id}`}>
+              {/* ✅ FIX route */}
+              <Link href={`/solaire.homme/${product.id}`}>
                 <img
-                  // 🔹 Affiche la première image du tableau
-                  src={product.images?.[0] || "/placeholder.jpg"}
+                  src={product.images?.[0] || "https://via.placeholder.com/400"}
                   alt={product.nom}
                   className="h-64 w-full object-cover group-hover:scale-105 transition"
                 />
               </Link>
 
               <div className="p-6">
-                <Link href={`/homme/${product.id}`}>
+                <Link href={`/solaire.homme/${product.id}`}>
                   <h3 className="text-lg font-medium hover:underline">
                     {product.nom}
                   </h3>
@@ -142,12 +157,12 @@ export default function HommePage() {
                 )}
 
                 <p className="text-xl font-semibold mt-3">
-                  {product.prix} DA 
+                  {product.prix} DA
                 </p>
 
                 <button
                   onClick={() => addToCart(product)}
-                  className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition"
+                  className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200"
                 >
                   Ajouter au panier
                 </button>
@@ -167,7 +182,7 @@ export default function HommePage() {
               page === num
                 ? "bg-white text-black"
                 : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-            } transition`}
+            }`}
           >
             {num}
           </button>
@@ -175,4 +190,4 @@ export default function HommePage() {
       </div>
     </main>
   );
-} 
+}

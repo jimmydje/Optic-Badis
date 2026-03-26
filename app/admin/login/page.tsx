@@ -1,8 +1,17 @@
+/*
 "use client";
 
 import { useState } from "react";
+import { redirect, useRouter } from "next/navigation";
+import { createAuthClient } from "@neondatabase/auth";
+
+// 🔹 Initialise le client Neon Auth avec ton URL 
+const authClient = createAuthClient({ 
+  baseUrl: "https://ep-nameless-morning-agyfz4ox.neonauth.c-2.eu-central-1.aws.neon.tech", // Remplace par ton URL Neon Auth
+}); 
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,22 +22,30 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      // 🔹 Connexion via Neon Auth
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
 
-    setLoading(false);
+      if (error) {
+        setError(error.message || "Erreur de connexion");
+        setLoading(false);
+        return;
+      }
 
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error || "Erreur de connexion");
-      return;
+      console.log("Utilisateur connecté :", data);
+
+      // 🔹 Redirection après login réussi
+      redirect("/admin/produits"); 
+
+    } catch (err) {
+      console.error("Erreur login :", err);
+      setError("Erreur serveur");
     }
 
-    // ✅ connecté
-    window.location.href = "/admin";
+    setLoading(false);
   };
 
   return (
@@ -74,3 +91,4 @@ export default function AdminLoginPage() {
     </div>
   );
 }
+  */

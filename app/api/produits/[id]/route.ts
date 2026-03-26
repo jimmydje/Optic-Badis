@@ -1,19 +1,25 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// ✅ Catégories autorisées
-const CATEGORIES_AUTORISEES = ["Homme", "Femme", "Enfant", "Lentilles"];
-
-// ======================================================
-// 🔹 GET → Récupérer UN produit par ID
-// ======================================================
+const CATEGORIES_AUTORISEES = [
+  "Homme",
+  "Femme",
+  "Enfant",
+  "Lentilles",
+  "Solaire Homme",
+  "Solaire Femme",
+];
+ 
+// 🔹 GET
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   try {
     const produit = await prisma.produit.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!produit) {
@@ -25,70 +31,61 @@ export async function GET(
 
     return NextResponse.json(produit);
   } catch (error) {
-    console.error("Erreur GET produit par ID :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
 
-// ======================================================
-// 🔹 PUT → Modifier un produit par ID
-// ======================================================
+// 🔹 PUT
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+  const body = await req.json();
+
+  if (
+    body.categorie &&
+    !CATEGORIES_AUTORISEES.includes(body.categorie)
+  ) {
+    return NextResponse.json(
+      { error: "Catégorie invalide" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const body = await req.json();
-
-    if (
-      body.categorie &&
-      !CATEGORIES_AUTORISEES.includes(body.categorie)
-    ) {
-      return NextResponse.json(
-        { error: "Catégorie invalide" },
-        { status: 400 }
-      );
-    }
-
     const updated = await prisma.produit.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         nom: body.nom,
         description: body.description ?? null,
-        prix:
-          body.prix !== undefined
-            ? Number(body.prix)
-            : undefined,
-        imageUrl: body.imageUrl ?? undefined,
+        prix: body.prix ? Number(body.prix) : undefined,
         categorie: body.categorie ?? undefined,
         stock: body.stock ?? undefined,
+        images: body.images ?? undefined, // ✅ IMPORTANT (tableau)
       },
     });
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Erreur PUT produit :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
 
-// ======================================================
-// 🔹 DELETE → Supprimer un produit par ID
-// ======================================================
+// 🔹 DELETE
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   try {
     await prisma.produit.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
-    return NextResponse.json({
-      message: "Produit supprimé avec succès",
-    });
+    return NextResponse.json({ message: "Produit supprimé" });
   } catch (error) {
-    console.error("Erreur DELETE produit par ID :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

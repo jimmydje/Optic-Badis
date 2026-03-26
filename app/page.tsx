@@ -15,14 +15,10 @@ interface Produit {
 export default function HomePage() {
   const [produits, setProduits] = useState<Produit[]>([]);
 
-  // 🔒 Sécurise les images pour éviter erreur Next/Image
   const getImageSrc = (url: string | null) => {
     if (!url) return "/images/image1.jpg";
-
     if (url.startsWith("/")) return url;
-
     if (url.startsWith("http")) return url;
-
     return "/images/image1.jpg";
   };
 
@@ -52,6 +48,7 @@ export default function HomePage() {
           alt="Badis Optic"
           fill
           priority
+          sizes="100vw"
           className="object-cover"
         />
 
@@ -69,7 +66,7 @@ export default function HomePage() {
 
           <Link href="/promotions">
             <button className="mt-10 px-8 py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
-              Découvrir nos prommotions 
+              Découvrir nos promotions
             </button>
           </Link>
         </div>
@@ -98,68 +95,71 @@ export default function HomePage() {
               src="/images/image5.jpg"
               alt="Boutique Badis Optic"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </div>
         </div>
       </section>
 
-     {/* NOUVEAUTÉS */}
-<section className="py-24 px-6 bg-neutral-950">
-  <div className="max-w-6xl mx-auto">
-    <h2 className="text-3xl md:text-4xl font-semibold text-center mb-14">
-      Nouveautés
-    </h2>
+      {/* NOUVEAUTÉS */}
+      <section className="py-24 px-6 bg-neutral-950">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-semibold text-center mb-14">
+            Nouveautés
+          </h2>
 
-    {produits.length === 0 ? (
-      <p className="text-center text-neutral-400">
-        Aucun produit récent
-      </p>
-    ) : (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-        {produits.map((produit) => {
-          let categoriePath = "homme";
+          {produits.length === 0 ? (
+            <p className="text-center text-neutral-400">
+              Aucun produit récent
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+              {produits.map((produit) => {
+                let categoriePath = "homme";
 
-          if (produit.categorie?.toLowerCase() === "femme")
-            categoriePath = "femme";
-          if (produit.categorie?.toLowerCase() === "enfant")
-            categoriePath = "enfants";
-          if (produit.categorie?.toLowerCase() === "lentilles")
-            categoriePath = "lentilles";
+                if (produit.categorie?.toLowerCase() === "femme")
+                  categoriePath = "femme";
+                if (produit.categorie?.toLowerCase() === "enfant")
+                  categoriePath = "enfants";
+                if (produit.categorie?.toLowerCase() === "lentilles")
+                  categoriePath = "lentilles";
 
-          return (
-            <Link
-              key={produit.id}
-              href={`/${categoriePath}/${produit.id}`}
-            >
-              <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
-                <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
-                  <Image
-                    src={getImageSrc(produit.imageUrl)}
-                    alt={produit.nom}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-300"
-                  />
-                </div>
+                return (
+                  <Link
+                    key={produit.id}
+                    href={`/${categoriePath}/${produit.id}`}
+                  >
+                    <div className="group bg-neutral-900 rounded-3xl p-6 hover:bg-neutral-800 transition cursor-pointer">
+                      <div className="relative h-52 rounded-2xl overflow-hidden mb-6">
+                        <Image
+                          src={getImageSrc(produit.imageUrl)}
+                          alt={produit.nom}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-105 transition duration-300"
+                        />
+                      </div>
 
-                <h3 className="text-xl font-medium">
-                  {produit.categorie || "Produit"}
-                </h3>
+                      <h3 className="text-xl font-medium">
+                        {produit.categorie || "Produit"}
+                      </h3>
 
-                <p className="text-neutral-400 text-sm mt-2">
-                  {produit.nom}
-                </p>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    )}
-  </div>
-</section>
+                      <p className="text-neutral-400 text-sm mt-2">
+                        {produit.nom}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* CONTACT */}
       <section className="py-24 px-6 bg-neutral-900">
-        <div className="max-w-5xl mx-auto text-center">
+        <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-semibold mb-6">
             Contactez-nous
           </h2>
@@ -168,69 +168,21 @@ export default function HomePage() {
             accompagner.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-14 text-left">
-            
-            {/* INFOS */}
-            <div className="space-y-6 text-neutral-300">
-              <div>
-                <h4 className="text-white font-medium mb-2">Adresse</h4>
-                <p>Annaba, Algérie</p>
-              </div>
-
-              <div>
-                <h4 className="text-white font-medium mb-2">Téléphone</h4>
-                <p>+213 550 35 27 02</p>
-              </div>
-
-              <div>
-                <h4 className="text-white font-medium mb-2">Horaires</h4>
-                <p>Sam – Jeu : 9h à 20h</p>
-              </div>
+          <div className="space-y-6 text-neutral-300">
+            <div>
+              <h4 className="text-white font-medium mb-2">Adresse</h4>
+              <p>Annaba, Algérie</p>
             </div>
 
-            {/* FORMULAIRE */}
-            <form className="bg-neutral-950 p-8 rounded-3xl space-y-6">
-              <div>
-                <label className="block text-sm text-neutral-400 mb-2">
-                  Nom complet
-                </label>
-                <input
-                  type="text"
-                  placeholder="Votre nom"
-                  className="w-full px-4 py-3 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:border-white transition"
-                />
-              </div>
+            <div>
+              <h4 className="text-white font-medium mb-2">Téléphone</h4>
+              <p>+213 550 35 27 02</p>
+            </div>
 
-              <div>
-                <label className="block text-sm text-neutral-400 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="Votre email"
-                  className="w-full px-4 py-3 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:border-white transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-neutral-400 mb-2">
-                  Message
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Votre message..."
-                  className="w-full px-4 py-3 rounded-xl bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:border-white transition resize-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition"
-              >
-                Envoyer le message
-              </button>
-            </form>
-
+            <div>
+              <h4 className="text-white font-medium mb-2">Horaires</h4>
+              <p>Sam – Jeu : 9h à 20h</p>
+            </div>
           </div>
         </div>
       </section>

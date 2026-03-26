@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Star } from "lucide-react";
 
-interface Product {
+interface Product {  
   id: string;
   nom: string;
   description?: string;
@@ -47,48 +47,50 @@ export default function ProduitDetailPage() {
 
       {/* ---- IMAGE ---- */}
       <div className="flex items-center justify-center">
-        {product.imageUrl && (
-          <div className="relative w-full h-[420px]">
-            <Image
-              src={product.imageUrl}
-              alt={product.nom}
-              fill
-              className="object-contain drop-shadow-xl"
-            />
-          </div>
-        )}
+        <div className="relative w-full h-[420px]">
+          <Image
+            src={product.imageUrl || "/images/image1.jpg"}
+            alt={product.nom}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain drop-shadow-xl"
+          />
+        </div>
       </div>
 
       {/* ---- INFOS ---- */}
       <div className="space-y-5">
 
-        {/* TITRE */}
         <h1 className="text-4xl font-bold">{product.nom}</h1>
 
-        {/* ⭐⭐⭐⭐⭐ AVIS */}
+        {/* ⭐⭐⭐⭐⭐ */}
         <div className="flex items-center gap-2 text-yellow-500">
           {[...Array(5)].map((_, i) => (
             <Star key={i} size={20} fill="#facc15" stroke="#facc15" />
           ))}
-          <span className="text-gray-600">(464 Clients Satisfaits)</span>
+          <span className="text-gray-400">(464 Clients Satisfaits)</span>
         </div>
 
         {/* PRIX */}
         <div className="flex items-center gap-4">
-          <p className="text-3xl font-bold text-white">{product.prix} DA</p>
-          <p className="text-xl line-through text-white">DA 4,900.00</p>
+          <p className="text-3xl font-bold text-white">
+            {product.prix} DA
+          </p>
+          <p className="text-xl line-through text-white">
+            DA 4,900.00
+          </p>
 
           <span className="bg-[#DAAB3A] text-white text-sm px-3 py-1 rounded-full">
             SAVE - DA 500
           </span>
         </div>
 
-        {/* Badge édition limitée */}
+        {/* Badge */}
         <div className="bg-red-100 text-red-600 border border-red-300 px-4 py-2 rounded-lg w-fit font-medium">
           ⚠️ Attention : édition limitée
         </div>
 
-        {/* LISTE AVANTAGES */}
+        {/* LISTE */}
         <ul className="list-disc pl-5 space-y-1 text-white">
           <li>Design confortable et léger</li>
           <li>Matériaux premium</li>
@@ -98,15 +100,17 @@ export default function ProduitDetailPage() {
           <li>SAV réactif</li>
         </ul>
 
-        {/* ---- BOUTON BLEU ---- */}
-        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md  transition">
+        {/* BOUTON */}
+        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md hover:bg-[#c89b2f] transition">
           Ajouter au panier
         </button>
 
         {/* DESCRIPTION */}
         {product.description && (
           <div className="pt-4 text-white">
-            <h2 className="text-xl font-semibold mb-2">Description</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Description
+            </h2>
             <p>{product.description}</p>
           </div>
         )}

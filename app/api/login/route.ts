@@ -7,50 +7,59 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    // Récupération des données du body
     const { email, password } = await req.json();
 
-    // Vérification que l'utilisateur existe
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, error: "Email et mot de passe requis" },
+        { status: 400 }
+      );
+    }
+
     const user = await prisma.user.findUnique({ where: { email } });
+
     if (!user) {
       return NextResponse.json(
-        { message: "Utilisateur introuvable" },
+        { success: false, error: "Utilisateur introuvable" },
         { status: 404 }
       );
     }
 
-    // Vérification du mot de passe
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) {
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
       return NextResponse.json(
-        { message: "Mot de passe incorrect" },
+        { success: false, error: "Mot de passe incorrect" },
         { status: 401 }
       );
     }
 
-    // Génération du token JWT avec id et rôle
     const token = jwt.sign(
-      { id: user.id, role: user.role, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" }
     );
 
-    // On peut aussi stocker le token côté cookie si besoin
     const response = NextResponse.json({
-      message: "Connexion réussie",
-      token,
-      role: user.role, // optionnel, pratique côté front
+      success: true,
+      user: { id: user.id, email: user.email, role: user.role }
     });
 
-    // Exemple: stocker le token dans un cookie httpOnly
-    // response.cookies.set("token", token, { httpOnly: true, path: "/" });
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7
+    });
 
     return response;
-  } catch (err) {
-    console.error("Erreur login:", err);
+
+  } catch (error) {
+    console.error("Erreur login :", error);
     return NextResponse.json(
-      { message: "Erreur serveur" },
+      { success: false, error: "Erreur serveur" },
       { status: 500 }
     );
   }
-}
+}   

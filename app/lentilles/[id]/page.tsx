@@ -8,7 +8,7 @@ import { Star } from "lucide-react";
 interface Product {
   id: string;
   nom: string;
-  description?: string;
+  description?: string;  
   imageUrl?: string;
   prix?: number;
   marque?: string;
@@ -47,36 +47,38 @@ export default function LentilleDetailPage() {
 
       {/* ---- IMAGE ---- */}
       <div className="flex items-center justify-center">
-        {product.imageUrl && (
-          <div className="relative w-full h-[420px]">
-            <Image
-              src={product.imageUrl}
-              alt={product.nom}
-              fill
-              className="object-contain drop-shadow-xl"
-            />
-          </div>
-        )}
+        <div className="relative w-full h-[420px]">
+          <Image
+            src={product.imageUrl || "/images/image1.jpg"}
+            alt={product.nom}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain drop-shadow-xl"
+          />
+        </div>
       </div>
 
       {/* ---- INFOS ---- */}
       <div className="space-y-5">
 
-        {/* TITRE */}
         <h1 className="text-4xl font-bold">{product.nom}</h1>
 
-        {/* ⭐⭐⭐⭐⭐ AVIS */}
+        {/* ⭐⭐⭐⭐⭐ */}
         <div className="flex items-center gap-2 text-yellow-500">
           {[...Array(5)].map((_, i) => (
             <Star key={i} size={20} fill="#facc15" stroke="#facc15" />
           ))}
-          <span className="text-gray-600">(312 Utilisateurs satisfaits)</span>
+          <span className="text-gray-400">(312 Utilisateurs satisfaits)</span>
         </div>
 
         {/* PRIX */}
         <div className="flex items-center gap-4">
-          <p className="text-3xl font-bold text-white">{product.prix} DA</p>
-          <p className="text-xl line-through text-white">DA 6,200.00</p>
+          <p className="text-3xl font-bold text-white">
+            {product.prix} DA
+          </p>
+          <p className="text-xl line-through text-white">
+            DA 6,200.00
+          </p>
 
           <span className="bg-[#DAAB3A] text-white text-sm px-3 py-1 rounded-full">
             PROMO - DA 400
@@ -88,7 +90,7 @@ export default function LentilleDetailPage() {
           👁️ Lentilles certifiées & sécurisées
         </div>
 
-        {/* AVANTAGES LENTILLES */}
+        {/* LISTE */}
         <ul className="list-disc pl-5 space-y-1 text-white">
           <li>Confort longue durée</li>
           <li>Hydratation optimale</li>
@@ -98,15 +100,17 @@ export default function LentilleDetailPage() {
           <li>Paiement à la livraison</li>
         </ul>
 
-        {/* ---- BOUTON BLEU ---- */}
-        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md  transition">
+        {/* BOUTON */}
+        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md hover:bg-[#c89b2f] transition">
           Ajouter au panier
         </button>
 
         {/* DESCRIPTION */}
         {product.description && (
           <div className="pt-4 text-white">
-            <h2 className="text-xl font-semibold mb-2">Description</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Description
+            </h2>
             <p>{product.description}</p>
           </div>
         )}

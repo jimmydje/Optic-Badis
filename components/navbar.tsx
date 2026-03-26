@@ -8,13 +8,12 @@ import { useRouter, usePathname } from "next/navigation";
 export default function Navbar() {
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+
   const router = useRouter();
   const pathname = usePathname();
 
-  // ❌ Ne pas afficher la navbar dans /admin
-  if (pathname.startsWith("/admin")) {
-    return null;
-  }
+  // Cacher navbar dans admin
+  if (pathname.startsWith("/admin")) return null;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,9 +24,9 @@ export default function Navbar() {
   };
 
   const linkClass = (path: string) =>
-    `px-4 py-2 rounded-xl transition duration-300 ${
-      pathname === path
-        ? "text-[#DAAB3A] bg-[#1a1a1c]"
+    `px-4 py-2 rounded-xl transition cursor-pointer ${
+      pathname.startsWith(path)
+        ? "text-[#DAAB3A]"
         : "text-white hover:text-[#DAAB3A]"
     }`;
 
@@ -38,137 +37,105 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <div>
-            <h1 className="text-xl font-semibold text-[#DAAB3A]">
-              OPTIC BADIS
-            </h1>
-            <p className="text-xs text-gray-400">
-              VOTRE VISION, NOTRE PASSION
-            </p>
+            <h1 className="text-xl font-semibold text-[#DAAB3A]">OPTIC BADIS</h1>
+            <p className="text-xs text-gray-400">VOTRE VISION, NOTRE PASSION</p>
           </div>
         </Link>
 
-        {/* Desktop Menu */}
+        {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-4">
 
-          <Link href="/homme" className={linkClass("/homme")}>
-            Homme
-          </Link>
+          {/* Lunettes de vue */}
+          <div className="relative group">
+            <span className={linkClass("/lunettes-de-vue")}>Lunettes de vue</span>
+            <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-50">
+              <div className="bg-[#0E0E0F] text-white w-60 p-4 rounded-xl shadow-lg">
+                <h3 className="font-semibold mb-2">Catégories</h3>
+                <ul className="flex flex-col gap-2">
+                  <li>
+                    <Link href="/homme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue homme</Link>
+                  </li>
+                  <li>
+                    <Link href="/femme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue femme</Link>
+                  </li>
+                  <li>
+                    <Link href="/enfants" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue enfant</Link>
+                  </li>
+                  
+                </ul>
+              </div>
+            </div>
+          </div>
 
-          <Link href="/femme" className={linkClass("/femme")}>
-            Femme
-          </Link>
+          {/* Lunettes de soleil */}
+          <div className="relative group">
+            <span className={linkClass("/lunettes-de-soleil")}>Lunettes de soleil</span>
+            <div className="absolute left-0 top-full mt-2 hidden group-hover:block z-50">
+              <div className="bg-[#0E0E0F] text-white w-60 p-4 rounded-xl shadow-lg">
+                <h3 className="font-semibold mb-2">Catégories</h3>
+                <ul className="flex flex-col gap-2">
+                  <li>
+                    <span className="block px-2 py-1 rounded hover:text-[#DAAB3A] cursor-pointer">Homme</span>
+                  </li>
+                  <li>
+                    <span className="block px-2 py-1 rounded hover:text-[#DAAB3A] cursor-pointer">Femme</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
-          <Link href="/enfants" className={linkClass("/enfants")}>
-            Enfants
-          </Link>
+          {/* Lentilles */}
+          <Link href="/lentilles" className={linkClass("/lentilles")}>Lentilles</Link>
 
-          <Link href="/lentilles" className={linkClass("/lentilles")}>
-            Lentilles
-          </Link>
-
-          {/* Barre de recherche */}
-          <form
-            onSubmit={handleSearch}
-            className="flex items-center bg-white rounded-xl px-3 py-2 shadow-sm"
-          >
+          {/* Recherche */}
+          <form onSubmit={handleSearch} className="flex items-center bg-white rounded-xl px-3 py-2 shadow-sm">
             <input
               type="text"
               placeholder="Recherche..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent outline-none text-sm w-32 text-black placeholder-gray-500"
+              className="bg-transparent outline-none text-sm w-32 text-black"
             />
             <button type="submit">
-              <Search
-                size={18}
-                className="text-black hover:text-[#DAAB3A] transition"
-              />
+              <Search size={18} className="text-black hover:text-[#DAAB3A]" />
             </button>
           </form>
 
           {/* Panier */}
-          <Link
-            href="/panier"
-            className={`flex items-center gap-2 ${linkClass("/panier")}`}
-          >
-            <ShoppingCart size={18} className="text-white" />
+          <Link href="/panier" className={`flex items-center gap-2 ${linkClass("/panier")}`}>
+            <ShoppingCart size={18} />
             Panier
           </Link>
 
-          {/* Sign in / Sign up */}
-          <Link
-            href="/auth"
-            className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e] transition"
-          >
+          {/* Auth */}
+          <Link href="/auth" className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e]">
             Sign in / Sign up
           </Link>
         </div>
 
-        {/* Mobile Button */}
-        <button
-          className="md:hidden text-white"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
+        {/* Mobile button */}
+        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden mt-4 flex flex-col gap-4 bg-[#111113] p-4 rounded-xl">
+        <div className="md:hidden mt-4 flex flex-col gap-3 bg-[#111113] p-4 rounded-xl">
+          <span className="font-medium text-white">Lunettes de vue</span>
+          <Link href="/homme" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Homme</Link>
+          <Link href="/femme" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Femme</Link>
+          <Link href="/enfants" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Enfants</Link>
 
-          <Link
-            href="/homme"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass("/homme")}
-          >
-            Homme
-          </Link>
+          <span className="font-medium text-white mt-2">Lunettes de soleil</span>
+          <span className="px-4 py-2 text-white cursor-pointer hover:text-[#DAAB3A]">Homme</span>
+          <span className="px-4 py-2 text-white cursor-pointer hover:text-[#DAAB3A]">Femme</span>
 
-          <Link
-            href="/femme"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass("/femme")}
-          >
-            Femme
-          </Link>
-
-          <Link
-            href="/enfants"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass("/enfants")}
-          >
-            Enfants
-          </Link>
-
-          <Link
-            href="/lentilles"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass("/lentilles")}
-          >
-            Lentilles
-          </Link>
-
-          {/* Panier mobile */}
-          <Link
-            href="/panier"
-            onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-2 ${linkClass("/panier")}`}
-          >
-            <ShoppingCart size={18} className="text-white" />
-            Panier
-          </Link>
-
-          {/* Sign in / Sign up mobile */}
-          <Link
-            href="/auth"
-            onClick={() => setMobileOpen(false)}
-            className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium text-center"
-          >
-            Sign in / Sign up
-          </Link>
+          <Link href="/lentilles" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Lentilles</Link>
+          <Link href="/panier" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Panier</Link>
         </div>
       )}
     </nav>
   );
-}
+} 

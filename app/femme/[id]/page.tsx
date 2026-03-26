@@ -53,6 +53,7 @@ export default function ProduitDetailPage() {
               src={product.imageUrl}
               alt={product.nom}
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-contain drop-shadow-xl"
             />
           </div>
@@ -62,33 +63,36 @@ export default function ProduitDetailPage() {
       {/* ---- INFOS ---- */}
       <div className="space-y-5">
 
-        {/* TITRE */}
         <h1 className="text-4xl font-bold">{product.nom}</h1>
 
-        {/* ⭐⭐⭐⭐⭐ AVIS */}
+        {/* ⭐⭐⭐⭐⭐ */}
         <div className="flex items-center gap-2 text-white">
           {[...Array(5)].map((_, i) => (
             <Star key={i} size={20} fill="#facc15" stroke="#facc15" />
           ))}
-          <span className="text-white">(464 Clients Satisfaits)</span>
+          <span>(464 Clients Satisfaits)</span>
         </div>
 
         {/* PRIX */}
         <div className="flex items-center gap-4">
-          <p className="text-3xl font-bold text-white">{product.prix} DA</p>
-          <p className="text-xl line-through text-white">DA 4,900.00</p>
+          <p className="text-3xl font-bold text-white">
+            {product.prix} DA
+          </p>
+          <p className="text-xl line-through text-white">
+            DA 4,900.00
+          </p>
 
           <span className="bg-[#DAAB3A] text-white text-sm px-3 py-1 rounded-full">
             SAVE - DA 500
           </span>
         </div>
 
-        {/* Badge édition limitée */}
+        {/* Badge */}
         <div className="bg-red-100 text-red-600 border border-red-300 px-4 py-2 rounded-lg w-fit font-medium">
           ⚠️ Attention : édition limitée
         </div>
 
-        {/* LISTE AVANTAGES */}
+        {/* LISTE */}
         <ul className="list-disc pl-5 space-y-1 text-white">
           <li>Design confortable et léger</li>
           <li>Matériaux premium</li>
@@ -98,15 +102,17 @@ export default function ProduitDetailPage() {
           <li>SAV réactif</li>
         </ul>
 
-        {/* ---- BOUTON OR ---- */}
-        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md hover:bg-blue-700 transition">
+        {/* BOUTON */}
+        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md hover:bg-[#c89b2f] transition">
           Ajouter au panier
         </button>
 
         {/* DESCRIPTION */}
         {product.description && (
           <div className="pt-4 text-white">
-            <h2 className="text-xl font-semibold mb-2">Description</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Description
+            </h2>
             <p>{product.description}</p>
           </div>
         )}

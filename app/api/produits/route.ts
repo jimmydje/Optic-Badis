@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// ✅ Catégories autorisées
-const CATEGORIES_AUTORISEES = ["Homme", "Femme", "Enfant", "Lentilles"];
-
-interface ProduitBody {
-  nom: string;
-  description?: string;
-  prix: number;
-  imageUrl?: string | null;
-  categorie?: string | null;
-  stock?: number;
-}
+// ✅ Catégories exactes
+const CATEGORIES_AUTORISEES = [
+  "Homme",
+  "Femme",
+  "Enfant",
+  "Lentilles",
+  "Solaire Homme",
+  "Solaire Femme",
+];
 
 // =========================================
 // 🔹 GET → Récupérer les produits
@@ -21,12 +19,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const categorie = searchParams.get("categorie");
     const sort = searchParams.get("sort");
-    const search = searchParams.get("search"); // ✅ Recherche ajoutée
+    const search = searchParams.get("search");
     const limit = searchParams.get("limit")
       ? parseInt(searchParams.get("limit")!)
       : undefined;
 
-    // ✅ Validation catégorie
     if (categorie && !CATEGORIES_AUTORISEES.includes(categorie)) {
       return NextResponse.json(
         { error: "Catégorie invalide" },
@@ -34,32 +31,19 @@ export async function GET(req: Request) {
       );
     }
 
-    // 🔹 Tri dynamique
+    // Tri
     let orderBy: any = { createdAt: "desc" };
     if (sort === "prix-asc") orderBy = { prix: "asc" };
     if (sort === "prix-desc") orderBy = { prix: "desc" };
 
-    // 🔹 WHERE dynamique (categorie + search)
+    // Filtre
     let where: any = {};
-
-    if (categorie) {
-      where.categorie = categorie;
-    }
+    if (categorie) where.categorie = categorie;
 
     if (search) {
       where.OR = [
-        {
-          nom: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
-        {
-          description: {
-            contains: search,
-            mode: "insensitive",
-          },
-        },
+        { nom: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -79,10 +63,19 @@ export async function GET(req: Request) {
 // =========================================
 // 🔹 POST → Ajouter un produit
 // =========================================
+interface ProduitBody {
+  nom: string;
+  description?: string;
+  prix: number;
+  categorie?: string;
+  stock?: number;
+  images?: string[];
+}
+
 export async function POST(req: Request) {
   try {
     const data: ProduitBody = await req.json();
-    const { nom, description, prix, imageUrl, categorie, stock } = data;
+    const { nom, description, prix, categorie, stock, images } = data;
 
     if (!nom || prix === undefined || prix === null) {
       return NextResponse.json(
@@ -92,8 +85,12 @@ export async function POST(req: Request) {
     }
 
     if (categorie && !CATEGORIES_AUTORISEES.includes(categorie)) {
+      return NextResponse.json({ error: "Catégorie invalide" }, { status: 400 });
+    }
+
+    if (!images || images.length < 1 || images.length > 5) {
       return NextResponse.json(
-        { error: "Catégorie invalide" },
+        { error: "Veuillez ajouter entre 1 et 5 images" },
         { status: 400 }
       );
     }
@@ -103,9 +100,9 @@ export async function POST(req: Request) {
         nom,
         description: description || null,
         prix: Number(prix),
-        imageUrl: imageUrl || null,
         categorie: categorie || null,
         stock: stock ?? 0,
+        images,
       },
     });
 
@@ -122,18 +119,14 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
-
     if (!id) {
       return NextResponse.json({ error: "ID manquant" }, { status: 400 });
     }
 
-    await prisma.produit.delete({
-      where: { id },
-    });
-
+    await prisma.produit.delete({ where: { id } });
     return NextResponse.json({ message: "Produit supprimé avec succès" });
   } catch (error) {
     console.error("Erreur DELETE produit :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-}
+}  

@@ -5,15 +5,15 @@ import Link from "next/link";
 
 interface Product {
   id: string;
-  images: string[]; // tableau d’images
+  images: string[];
   nom: string;
   marque?: string;
   prix: number;
-  categorie?: string;
+  categorie?: string; 
   createdAt: string;
 }
 
-export default function HommePage() {
+export default function SolaireFemmePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -25,8 +25,11 @@ export default function HommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Homme");
+        // ✅ CORRECTION ICI
+        const res = await fetch("/api/produits?categorie=Solaire Femme");
+
         if (!res.ok) throw new Error("Erreur API");
+
         const data = await res.json();
         setProducts(data);
       } catch (err) {
@@ -35,6 +38,7 @@ export default function HommePage() {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
@@ -43,6 +47,7 @@ export default function HommePage() {
     let cart = existing ? JSON.parse(existing) : [];
 
     const existingItem = cart.find((item: any) => item.id === product.id);
+
     if (existingItem) {
       existingItem.quantite += 1;
     } else {
@@ -59,20 +64,34 @@ export default function HommePage() {
   };
 
   let filtered = [...products];
-  if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
-  if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
-  if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
-  if (sort === "date-new") filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+
+  if (marqueFilter)
+    filtered = filtered.filter((p) => p.marque === marqueFilter);
+
+  if (sort === "price-asc")
+    filtered.sort((a, b) => a.prix - b.prix);
+
+  if (sort === "price-desc")
+    filtered.sort((a, b) => b.prix - a.prix);
+
+  if (sort === "date-new")
+    filtered.sort(
+      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+    );
 
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
-  const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
+
+  const marques = Array.from(
+    new Set(products.map((p) => p.marque).filter(Boolean))
+  );
+
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white px-6 py-20">
       <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
-        Collection Homme
+        Lunettes Solaires Femme
       </h1>
 
       {/* FILTRES */}
@@ -95,12 +114,17 @@ export default function HommePage() {
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
-            <option key={m} value={m}>{m}</option>
+            <option key={m} value={m}>
+              {m}
+            </option>
           ))}
         </select>
 
         <button
-          onClick={() => { setSort(""); setMarqueFilter(""); }}
+          onClick={() => {
+            setSort("");
+            setMarqueFilter("");
+          }}
           className="px-6 py-3 rounded-xl bg-white text-black hover:bg-neutral-200 transition"
         >
           Réinitialiser
@@ -111,7 +135,9 @@ export default function HommePage() {
       {loading ? (
         <p className="text-center text-neutral-400">Chargement...</p>
       ) : visibleProducts.length === 0 ? (
-        <p className="text-center text-neutral-400">Aucun produit trouvé.</p>
+        <p className="text-center text-neutral-400">
+          Aucun produit trouvé.
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {visibleProducts.map((product) => (
@@ -119,9 +145,8 @@ export default function HommePage() {
               key={product.id}
               className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
             >
-              <Link href={`/homme/${product.id}`}>
+              <Link href={`/solaire/femme/${product.id}`}>
                 <img
-                  // 🔹 Affiche la première image du tableau
                   src={product.images?.[0] || "/placeholder.jpg"}
                   alt={product.nom}
                   className="h-64 w-full object-cover group-hover:scale-105 transition"
@@ -129,7 +154,7 @@ export default function HommePage() {
               </Link>
 
               <div className="p-6">
-                <Link href={`/homme/${product.id}`}>
+                <Link href={`/solaire/femme/${product.id}`}>
                   <h3 className="text-lg font-medium hover:underline">
                     {product.nom}
                   </h3>
@@ -142,7 +167,7 @@ export default function HommePage() {
                 )}
 
                 <p className="text-xl font-semibold mt-3">
-                  {product.prix} DA 
+                  {product.prix} DA
                 </p>
 
                 <button
@@ -175,4 +200,4 @@ export default function HommePage() {
       </div>
     </main>
   );
-} 
+}

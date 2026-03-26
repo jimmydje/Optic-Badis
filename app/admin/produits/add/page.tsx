@@ -8,7 +8,7 @@ interface ProduitForm {
   description: string;
   prix: number | "";
   categorie: string;
-  imageUrl: string;
+  images: string[]; // tableau d’images
   stock: number | "";
 }
 
@@ -20,12 +20,13 @@ export default function AjouterProduitPage() {
     description: "",
     prix: "",
     categorie: "",
-    imageUrl: "",
+    images: [], // vide au départ
     stock: "",
   });
 
   const [loading, setLoading] = useState(false);
 
+  // Gestion des champs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -43,8 +44,18 @@ export default function AjouterProduitPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validation champs obligatoires
     if (!produit.nom || produit.prix === "" || !produit.categorie || produit.stock === "") {
       alert("Veuillez remplir tous les champs obligatoires !");
+      return;
+    }
+
+    // Filtrer les images valides
+    const filledImages = produit.images.filter((img) => img.trim() !== "");
+
+    // Validation nombre d'images : minimum 1, maximum 5
+    if (filledImages.length < 1 || filledImages.length > 5) {
+      alert("Veuillez ajouter entre 1 et 5 images !");
       return;
     }
 
@@ -58,6 +69,7 @@ export default function AjouterProduitPage() {
           ...produit,
           prix: Number(produit.prix),
           stock: Number(produit.stock),
+          images: filledImages, // envoyer tableau propre
         }),
       });
 
@@ -83,6 +95,7 @@ export default function AjouterProduitPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Nom */}
         <div>
           <label className="block text-gray-700 mb-1">Nom du produit *</label>
           <input
@@ -95,6 +108,7 @@ export default function AjouterProduitPage() {
           />
         </div>
 
+        {/* Prix */}
         <div>
           <label className="block text-gray-700 mb-1">Prix (DA) *</label>
           <input
@@ -108,6 +122,7 @@ export default function AjouterProduitPage() {
           />
         </div>
 
+        {/* Catégorie */}
         <div>
           <label className="block text-gray-700 mb-1">Catégorie *</label>
           <select
@@ -125,6 +140,7 @@ export default function AjouterProduitPage() {
           </select>
         </div>
 
+        {/* Stock */}
         <div>
           <label className="block text-gray-700 mb-1">Stock *</label>
           <input
@@ -138,17 +154,26 @@ export default function AjouterProduitPage() {
           />
         </div>
 
+        {/* Images */}
         <div>
-          <label className="block text-gray-700 mb-1">Image (URL)</label>
-          <input
-            type="text"
-            name="imageUrl"
-            value={produit.imageUrl}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
+          <label className="block text-gray-700 mb-1">Images (1 à 5 URLs) *</label>
+          {Array.from({ length: 5 }).map((_, idx) => (
+            <input
+              key={idx}
+              type="text"
+              placeholder={`URL Image ${idx + 1}`}
+              value={produit.images[idx] || ""}
+              onChange={(e) => {
+                const newImages = [...produit.images];
+                newImages[idx] = e.target.value;
+                setProduit({ ...produit, images: newImages });
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2"
+            />
+          ))}
         </div>
 
+        {/* Description */}
         <div>
           <label className="block text-gray-700 mb-1">Description</label>
           <textarea
@@ -160,6 +185,7 @@ export default function AjouterProduitPage() {
           />
         </div>
 
+        {/* Boutons */}
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"

@@ -8,7 +8,6 @@ export default function PanierPage() {
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
 
-  // Charger le panier depuis localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
@@ -16,17 +15,14 @@ export default function PanierPage() {
     }
   }, []);
 
-  // Supprimer un produit
   const removeFromCart = (id: string) => {
     const updatedCart = cart.filter((item) => item.id !== id);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Calcul du total
   const total = cart.reduce((sum, item) => sum + item.prix * item.quantite, 0);
 
-  // 🧾 Envoyer la commande vers ton API Prisma
   const passerCommande = async () => {
     if (!nom || !email || !telephone) {
       alert("Veuillez remplir toutes vos coordonnées !");
@@ -48,33 +44,26 @@ export default function PanierPage() {
       });
 
       if (res.ok) {
-        alert("✅ Commande enregistrée avec succès !");
+        alert("✅ Commande enregistrée !");
         setCart([]);
         localStorage.removeItem("cart");
-        setNom("");
-        setEmail("");
-        setTelephone("");
       } else {
-        alert("❌ Erreur lors de l’enregistrement de la commande.");
+        alert("Erreur lors de la commande");
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Erreur serveur !");
     }
   };
 
-  // Si le panier est vide
   if (cart.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-[80vh] bg-gray-50 text-gray-800">
-        <h1 className="text-3xl font-semibold mb-4">🛒 Votre panier</h1>
-        <p className="text-lg text-gray-600">
-          Votre panier est actuellement vide.
-        </p>
+      <main className="flex flex-col items-center justify-center min-h-[80vh] bg-black text-white">
+        <h1 className="text-3xl font-bold mb-4">🛒 Votre panier</h1>
+        <p className="text-gray-400">Votre panier est vide.</p>
 
         <a
           href="/"
-          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+          className="mt-6 bg-yellow-500 text-black px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition"
         >
           Continuer vos achats
         </a>
@@ -82,33 +71,36 @@ export default function PanierPage() {
     );
   }
 
-  // Si le panier contient des produits
   return (
-    <main className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-semibold mb-6 text-center text-gray-800">
+    <main className="p-10 bg-black min-h-screen text-white">
+      <h1 className="text-3xl font-bold mb-8 text-center">
         🛍️ Votre panier
       </h1>
 
-      <div className="bg-white shadow rounded-xl p-6">
-        <table className="w-full border-collapse text-left">
+      <div className="bg-[#111] rounded-xl shadow-lg p-6 border border-gray-800">
+
+        <table className="w-full text-left">
           <thead>
-            <tr className="border-b text-gray-600">
-              <th className="py-2">Produit</th>
-              <th className="py-2">Prix</th>
-              <th className="py-2">Quantité</th>
-              <th className="py-2 text-right">Actions</th>
-            </tr>
-          </thead>
+  <tr className="border-b border-gray-700 text-gray-400">
+    <th className="py-2">Image</th>
+    <th className="py-2">Produit</th>
+    <th className="py-2">Prix</th>
+    <th className="py-2">Quantité</th>
+    <th className="py-2 text-right">Actions</th>
+  </tr>
+</thead>
+
           <tbody>
             {cart.map((item) => (
-              <tr key={item.id} className="border-b hover:bg-gray-50">
-                <td className="py-2">{item.nom}</td>
-                <td className="py-2">{item.prix} DA</td>
-                <td className="py-2">{item.quantite}</td>
-                <td className="py-2 text-right">
+              <tr key={item.id} className="border-b border-gray-800">
+                <td className="py-3">{item.nom}</td>
+                <td className="py-3">{item.prix} DA</td>
+                <td className="py-3">{item.quantite}</td>
+
+                <td className="py-3 text-right">
                   <button
                     onClick={() => removeFromCart(item.id)}
-                    className="text-red-600 hover:underline"
+                    className="text-red-400 hover:text-red-600"
                   >
                     Supprimer
                   </button>
@@ -118,46 +110,49 @@ export default function PanierPage() {
           </tbody>
         </table>
 
-        {/* Formulaire coordonnées client */}
-        <div className="mt-6 flex flex-col md:flex-row justify-between gap-4">
+        <div className="mt-8 grid md:grid-cols-2 gap-6">
+
+          {/* Formulaire */}
           <div className="flex flex-col gap-3">
             <input
               type="text"
               placeholder="Nom"
               value={nom}
               onChange={(e) => setNom(e.target.value)}
-              className="border px-3 py-2 rounded-lg"
-              required
+              className="bg-black border border-gray-700 px-4 py-2 rounded-lg focus:border-yellow-500 outline-none"
             />
+
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border px-3 py-2 rounded-lg"
-              required
+              className="bg-black border border-gray-700 px-4 py-2 rounded-lg focus:border-yellow-500 outline-none"
             />
+
             <input
               type="tel"
               placeholder="Téléphone"
               value={telephone}
               onChange={(e) => setTelephone(e.target.value)}
-              className="border px-3 py-2 rounded-lg"
-              required
+              className="bg-black border border-gray-700 px-4 py-2 rounded-lg focus:border-yellow-500 outline-none"
             />
           </div>
 
-          <div className="text-right">
-            <p className="text-lg font-semibold text-gray-800">
-              Total : {total.toFixed(2)} DA
+          {/* Total */}
+          <div className="flex flex-col justify-center items-end">
+            <p className="text-xl font-semibold mb-3">
+              Total : <span className="text-yellow-500">{total} DA</span>
             </p>
+
             <button
               onClick={passerCommande}
-              className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              className="bg-yellow-500 text-black px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition"
             >
               Passer la commande
             </button>
           </div>
+
         </div>
       </div>
     </main>
