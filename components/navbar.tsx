@@ -4,8 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { ShoppingCart, Search, Menu, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { authClient } from '@/lib/auth/client';
+
+// Server components using auth methods must be rendered dynamically
+export const dynamic = 'force-dynamic';
 
 export default function Navbar() {
+  const { data: session } =  authClient.useSession();
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -109,11 +114,14 @@ export default function Navbar() {
           </Link>
 
           {/* Auth */}
-          <Link href="/auth" className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e]">
-            Sign in / Sign up
-          </Link>
+          {session?.user ? (
+            <span className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium">Welcome, {session.user.name}</span>
+          ) : (
+            <Link href="/auth/sign-in" className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e]">
+              Sign in
+            </Link>
+          )}
         </div>
-
         {/* Mobile button */}
         <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={26} /> : <Menu size={26} />}

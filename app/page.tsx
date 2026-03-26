@@ -1,8 +1,9 @@
 "use client";
-
+import { auth } from '@/lib/auth/server';
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
 
 interface Produit {
   id: string;
@@ -11,8 +12,12 @@ interface Produit {
   categorie: string | null;
   createdAt: string;
 }
+// Server components using auth methods must be rendered dynamically
+export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
+
+
   const [produits, setProduits] = useState<Produit[]>([]);
 
   const getImageSrc = (url: string | null) => {
@@ -50,7 +55,7 @@ export default function HomePage() {
           priority
           sizes="100vw"
           className="object-cover"
-        />
+        />   
 
         <div className="absolute inset-0 bg-black/60" />
 
