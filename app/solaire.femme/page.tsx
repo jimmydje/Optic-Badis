@@ -26,9 +26,9 @@ export default function SolaireFemmePage() {
     const fetchProducts = async () => {
       try {
         // ✅ CORRECTION ICI
-        const res = await fetch("/api/produits?categorie=Solaire Femme");
+        const res = await fetch("/api/produits?categorie=solaire.femme");
 
-        if (!res.ok) throw new Error("Erreur API");
+        if (!res.ok) throw new Error("Erreur API"); 
 
         const data = await res.json();
         setProducts(data);

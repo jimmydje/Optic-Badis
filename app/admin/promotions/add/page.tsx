@@ -65,7 +65,7 @@ export default function AjouterPromotionPage() {
       alert("✅ Promotion ajoutée avec succès !");
       router.push("/admin/promotions");
     } catch (err: any) {
-      console.error("Erreur lors de l'ajout :", err);
+      console.error(err);
       alert(`❌ Une erreur est survenue : ${err.message}`);
     } finally {
       setLoading(false);
@@ -73,39 +73,43 @@ export default function AjouterPromotionPage() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl mx-auto mt-10">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="bg-white text-black p-6 rounded-lg shadow-md max-w-3xl mx-auto mt-10">
+      <h1 className="text-2xl font-bold mb-6">
         Ajouter une promotion
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Nom */}
         <div>
-          <label className="block text-gray-700 mb-1">Nom du produit *</label>
+          <label className="block mb-1">Nom du produit *</label>
           <input
             type="text"
             name="nom"
             value={promo.nom}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black bg-white focus:border-blue-500 focus:outline-none"
             required
           />
         </div>
 
+        {/* Prix */}
         <div>
-          <label className="block text-gray-700 mb-1">Prix (DA) *</label>
+          <label className="block mb-1">Prix (DA) *</label>
           <input
             type="number"
             name="prix"
             value={promo.prix}
             onChange={handleChange}
             min="0"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black bg-white focus:border-blue-500 focus:outline-none"
             required
           />
         </div>
 
+        {/* Promotion */}
         <div>
-          <label className="block text-gray-700 mb-1">Promotion (%) *</label>
+          <label className="block mb-1">Promotion (%) *</label>
           <input
             type="number"
             name="promotion"
@@ -113,41 +117,45 @@ export default function AjouterPromotionPage() {
             onChange={handleChange}
             min="0"
             max="100"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black bg-white focus:border-blue-500 focus:outline-none"
             required
           />
         </div>
 
+        {/* Image */}
         <div>
-          <label className="block text-gray-700 mb-1">Image (URL)</label>
+          <label className="block mb-1">Image (URL)</label>
           <input
             type="text"
             name="imageUrl"
             value={promo.imageUrl}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black bg-white focus:border-blue-500 focus:outline-none"
           />
         </div>
 
+        {/* Description */}
         <div>
-          <label className="block text-gray-700 mb-1">Description</label>
+          <label className="block mb-1">Description</label>
           <textarea
             name="description"
             value={promo.description}
             onChange={handleChange}
             rows={4}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black bg-white focus:border-blue-500 focus:outline-none"
           />
         </div>
 
+        {/* Boutons */}
         <div className="flex justify-end gap-3 pt-4">
           <button
             type="button"
             onClick={() => router.push("/admin/promotions")}
-            className="px-4 py-2 rounded-lg border"
+            className="px-4 py-2 rounded-lg border border-gray-300 text-black bg-white"
           >
             Annuler
           </button>
+
           <button
             type="submit"
             disabled={loading}
@@ -161,4 +169,4 @@ export default function AjouterPromotionPage() {
       </form>
     </div>
   );
-}
+}  

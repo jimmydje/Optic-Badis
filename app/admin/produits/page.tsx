@@ -28,12 +28,15 @@ export default function ProduitsPage() {
         if (categorie) url.searchParams.set("categorie", categorie);
 
         const res = await fetch(url.toString());
-        if (!res.ok) throw new Error("Erreur lors du chargement");
-
         const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Erreur serveur");
+        }
+
         setProduits(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Erreur de chargement des produits :", err);
+        console.error(err);
         setErreur("Impossible de charger les produits.");
       } finally {
         setChargement(false);
@@ -59,8 +62,8 @@ export default function ProduitsPage() {
         alert("Erreur lors de la suppression");
       }
     } catch (err) {
-      console.error("Erreur de suppression :", err);
-      alert("Erreur serveur lors de la suppression");
+      console.error(err);
+      alert("Erreur serveur");
     }
   };
 
@@ -69,38 +72,46 @@ export default function ProduitsPage() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm text-black">
+    <div className="p-6 bg-white text-black rounded-lg shadow-sm">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Produits</h1>
         <button
           onClick={() => router.push("/admin/produits/add")}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
         >
           + Ajouter un produit
         </button>
       </div>
 
-      {/* Filtre catégorie */}
+      {/* Filtre */}
       <div className="mb-4">
-        <label className="mr-2 font-medium">Filtrer par catégorie :</label>
+        <label className="mr-2 font-medium">
+          Filtrer par catégorie :
+        </label>
+
         <select
           value={categorie}
           onChange={(e) => setCategorie(e.target.value)}
-          className="border border-black rounded px-2 py-1"
+          className="border border-gray-300 rounded px-3 py-2 text-black bg-white"
         >
-          <option value="">Toutes</option>
-          <option value="Homme">Homme</option>
-          <option value="Femme">Femme</option>
-          <option value="Enfant">Enfant</option>
-          <option value="Lentilles">Lentilles</option>
+          <option value="" className="text-black">Toutes</option>
+          <option value="Homme" className="text-black">Homme</option>
+          <option value="Femme" className="text-black">Femme</option>
+          <option value="Enfant" className="text-black">Enfant</option>
+          <option value="Lentilles" className="text-black">Lentilles</option>
         </select>
       </div>
 
-      {erreur && <div className="mb-4 text-red-600 font-medium">{erreur}</div>}
+      {/* Erreur */}
+      {erreur && (
+        <div className="mb-4 text-red-600 font-medium">{erreur}</div>
+      )}
 
+      {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 rounded-lg">
-          <thead className="bg-gray-100 text-black">
+        <table className="min-w-full border border-gray-200 rounded-lg text-black">
+          <thead className="bg-gray-100">
             <tr>
               <th className="py-2 px-4 text-left">Nom</th>
               <th className="py-2 px-4 text-left">Description</th>
@@ -111,7 +122,7 @@ export default function ProduitsPage() {
             </tr>
           </thead>
 
-          <tbody className="text-black">
+          <tbody>
             {chargement ? (
               <tr>
                 <td colSpan={6} className="text-center py-4">
@@ -128,10 +139,18 @@ export default function ProduitsPage() {
               produits.map((produit) => (
                 <tr key={produit.id} className="border-t hover:bg-gray-50">
                   <td className="py-2 px-4">{produit.nom}</td>
-                  <td className="py-2 px-4">{produit.description || "-"}</td>
-                  <td className="py-2 px-4">{produit.prix} DA</td>
-                  <td className="py-2 px-4">{produit.categorie || "-"}</td>
-                  <td className="py-2 px-4">{produit.stock}</td>
+                  <td className="py-2 px-4">
+                    {produit.description || "-"}
+                  </td>
+                  <td className="py-2 px-4">
+                    {produit.prix} DA
+                  </td>
+                  <td className="py-2 px-4">
+                    {produit.categorie || "-"}
+                  </td>
+                  <td className="py-2 px-4">
+                    {produit.stock ?? 0}
+                  </td>
                   <td className="py-2 px-4 text-center space-x-2">
                     <button
                       onClick={() => modifierProduit(produit.id)}
@@ -154,4 +173,4 @@ export default function ProduitsPage() {
       </div>
     </div>
   );
-}
+} 

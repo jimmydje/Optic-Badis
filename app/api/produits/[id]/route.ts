@@ -6,9 +6,9 @@ const CATEGORIES_AUTORISEES = [
   "Femme",
   "Enfant",
   "Lentilles",
-  "Solaire Homme",
-  "Solaire Femme",
-];
+  "solaire.homme",
+  "solaire.femme",
+];  
  
 // 🔹 GET
 export async function GET(

@@ -2,20 +2,26 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ShoppingCart, Search, Menu, X } from "lucide-react";
+import { ShoppingCart, Search, Menu, X, LogOut } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { authClient } from '@/lib/auth/client';
-
+ 
 // Server components using auth methods must be rendered dynamically
 export const dynamic = 'force-dynamic';
 
 export default function Navbar() {
-  const { data: session } =  authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
+
+  // 🔥 Logout function
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.push('/');
+  };
 
   // Cacher navbar dans admin
   if (pathname.startsWith("/admin")) return null;
@@ -66,7 +72,6 @@ export default function Navbar() {
                   <li>
                     <Link href="/enfants" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue enfant</Link>
                   </li>
-                  
                 </ul>
               </div>
             </div>
@@ -115,13 +120,31 @@ export default function Navbar() {
 
           {/* Auth */}
           {session?.user ? (
-            <span className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium">Welcome, {session.user.name}</span>
+            <div className="flex items-center gap-3">
+
+              <span className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium">
+                {session.user.name}
+              </span>
+
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-xl bg-red-500 hover:bg-red-600 transition"
+                title="Se déconnecter"
+              >
+                <LogOut size={18} className="text-white" />
+              </button>
+
+            </div>
           ) : (
-            <Link href="/auth/sign-in" className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e]">
+            <Link
+              href="/auth/sign-in"
+              className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e]"
+            >
               Sign in
             </Link>
           )}
         </div>
+
         {/* Mobile button */}
         <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={26} /> : <Menu size={26} />}
@@ -146,4 +169,4 @@ export default function Navbar() {
       )}
     </nav>
   );
-} 
+}

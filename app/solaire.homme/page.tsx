@@ -10,7 +10,7 @@ interface Product {
   marque?: string;
   prix: number;
   categorie?: string;
-  createdAt: string; 
+  createdAt: string;
 }
 
 export default function SolaireHommePage() {
@@ -25,17 +25,29 @@ export default function SolaireHommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // ✅ FIX catégorie
-        const res = await fetch("/api/produits?categorie=Solaire Homme");
-        if (!res.ok) throw new Error("Erreur API");
+        // ✅ FIX catégorie (ALIGNÉ AVEC API + DB)
+        const res = await fetch("/api/produits?categorie=solaire.homme");
+
         const data = await res.json();
-        setProducts(data);
+
+        if (!res.ok) {
+          console.error("Erreur API :", data);
+          return;
+        }
+
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error("Format invalide :", data);
+          setProducts([]);
+        }
       } catch (err) {
-        console.error(err);
+        console.error("Erreur fetch :", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
@@ -134,7 +146,6 @@ export default function SolaireHommePage() {
               key={product.id}
               className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
             >
-              {/* ✅ FIX route */}
               <Link href={`/solaire.homme/${product.id}`}>
                 <img
                   src={product.images?.[0] || "https://via.placeholder.com/400"}
@@ -190,4 +201,4 @@ export default function SolaireHommePage() {
       </div>
     </main>
   );
-}
+}  
