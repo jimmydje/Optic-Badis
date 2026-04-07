@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "windows"]
 }
 
 datasource db {
@@ -7,31 +8,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-
 model Client {
-  id         String      @id @default(cuid())
-  nom        String
-  email      String      @unique
-  telephone  String?
-  createdAt  DateTime    @default(now())
-  commandes  Commande[]  @relation("ClientCommandes")
+  id        String     @id @default(cuid())
+  nom       String
+  email     String     @unique
+  telephone String?
+  createdAt DateTime   @default(now())
+  commandes Commande[] @relation("ClientCommandes")
 }
 
 model Produit {
-  id             String          @id @default(cuid())
-  nom            String
-  description    String?
-  prix           Float
-  images      String[] // tableau d’URLs
-  categorie      String?
-  marque         String?
-  stock          Int             @default(0)
-  promotion      Int?
-  itemsCommande  CommandeItem[]  @relation("ProduitItems")
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id            String         @id @default(cuid())
+  nom           String
+  description   String?
+  prix          Float
+  images        String[]
+  categorie     String?
+  marque        String?
+  stock         Int            @default(0)
+  promotion     Int?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  itemsCommande CommandeItem[] @relation("ProduitItems")
 }
 
 model Promotion {
@@ -50,18 +48,22 @@ model Commande {
   statut    String         @default("En cours")
   total     Float
   clientId  String
+  telephone String?
+  adresse   String?
   client    Client         @relation("ClientCommandes", fields: [clientId], references: [id], onDelete: Cascade)
   items     CommandeItem[] @relation("CommandeItems")
 }
 
 model CommandeItem {
-  id          String   @id @default(cuid())
-  commandeId  String
-  produitId   String
-  quantite    Int
-
-  commande Commande @relation("CommandeItems", fields: [commandeId], references: [id], onDelete: Cascade)
-  produit  Produit  @relation("ProduitItems", fields: [produitId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  commandeId String
+  produitId  String
+  quantite   Int
+  nom        String
+  prix       Float
+  image      String?
+  commande   Commande @relation("CommandeItems", fields: [commandeId], references: [id], onDelete: Cascade)
+  produit    Produit  @relation("ProduitItems", fields: [produitId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -70,6 +72,9 @@ model User {
   password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
+  phone     String
+  city      String
+  address   String
 }
 
 enum Role {

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 interface Product {
   id: string;
-  imageUrl?: string;
+  images: string[]; // ✅ FIX IMPORTANT
   nom: string;
   marque?: string;
   prix: number;
@@ -60,20 +60,26 @@ export default function EnfantsPage() {
 
   // Filtres & tri
   let filtered = [...products];
-  if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
+
+  if (marqueFilter) {
+    filtered = filtered.filter((p) => p.marque === marqueFilter);
+  }
 
   if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
   if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
-  if (sort === "date-new")
+  if (sort === "date-new") {
     filtered.sort(
       (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
     );
+  }
 
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
+
   const marques = Array.from(
     new Set(products.map((p) => p.marque).filter(Boolean))
   );
+
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
@@ -102,7 +108,9 @@ export default function EnfantsPage() {
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
-            <option key={m} value={m}>{m}</option>
+            <option key={m} value={m}>
+              {m}
+            </option>
           ))}
         </select>
 
@@ -131,7 +139,11 @@ export default function EnfantsPage() {
             >
               <Link href={`/enfants/${product.id}`}>
                 <img
-                  src={product.imageUrl || "/images/default.jpg"}
+                  src={
+                    product.images && product.images.length > 0
+                      ? product.images[0]
+                      : "/images/default.jpg"
+                  }
                   alt={product.nom}
                   className="h-64 w-full object-cover group-hover:scale-105 transition"
                 />
@@ -184,4 +196,4 @@ export default function EnfantsPage() {
       </div>
     </main>
   );
-}
+}  

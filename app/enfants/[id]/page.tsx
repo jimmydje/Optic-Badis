@@ -9,7 +9,7 @@ interface Product {
   id: string;
   nom: string;
   description?: string;
-  imageUrl?: string;
+  images: string[]; // ✅ FIX IMPORTANT
   prix?: number;
   marque?: string;
   categorie?: string;
@@ -49,7 +49,11 @@ export default function ProduitDetailPage() {
       <div className="flex items-center justify-center">
         <div className="relative w-full h-[420px]">
           <Image
-            src={product.imageUrl || "/images/image1.jpg"}
+            src={
+              product.images && product.images.length > 0
+                ? product.images[0]
+                : "/images/default.jpg"
+            }
             alt={product.nom}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -117,4 +121,4 @@ export default function ProduitDetailPage() {
       </div>
     </div>
   );
-}
+}  

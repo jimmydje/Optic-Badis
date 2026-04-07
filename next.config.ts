@@ -19,8 +19,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "i.postimg.cc",
       },
+      {
+        protocol: "https",
+        hostname: "freeimage.host", // ✅ AJOUT ICI
+      },
     ],
   },
 };
 
-export default nextConfig;
+export default nextConfig;  

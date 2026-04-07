@@ -10,6 +10,7 @@ interface Produit {
   prix: number;
   categorie?: string;
   stock?: number;
+  images?: string[]; // optionnel, pour éviter undefined
 }
 
 export default function ProduitsPage() {
@@ -18,7 +19,15 @@ export default function ProduitsPage() {
   const [chargement, setChargement] = useState(true);
   const [categorie, setCategorie] = useState("");
   const [erreur, setErreur] = useState("");
+  const [search, setSearch] = useState("");
 
+  // Récupérer searchParams côté client depuis l'URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setSearch(params.get("search") ?? "");
+  }, []);
+
+  // Fetch des produits
   useEffect(() => {
     const fetchProduits = async () => {
       setChargement(true);
@@ -26,6 +35,7 @@ export default function ProduitsPage() {
       try {
         const url = new URL("/api/produits", window.location.origin);
         if (categorie) url.searchParams.set("categorie", categorie);
+        if (search) url.searchParams.set("search", search);
 
         const res = await fetch(url.toString());
         const data = await res.json();
@@ -44,7 +54,7 @@ export default function ProduitsPage() {
     };
 
     fetchProduits();
-  }, [categorie]);
+  }, [categorie, search]);
 
   const supprimerProduit = async (id: string) => {
     if (!confirm("Voulez-vous vraiment supprimer ce produit ?")) return;
@@ -85,34 +95,30 @@ export default function ProduitsPage() {
       </div>
 
       {/* Filtre */}
-      <div className="mb-4">
-        <label className="mr-2 font-medium">
-          Filtrer par catégorie :
-        </label>
-
+      <div className="mb-4 flex items-center gap-4">
+        <label className="font-medium">Filtrer par catégorie :</label>
         <select
           value={categorie}
           onChange={(e) => setCategorie(e.target.value)}
           className="border border-gray-300 rounded px-3 py-2 text-black bg-white"
         >
-          <option value="" className="text-black">Toutes</option>
-          <option value="Homme" className="text-black">Homme</option>
-          <option value="Femme" className="text-black">Femme</option>
-          <option value="Enfant" className="text-black">Enfant</option>
-          <option value="Lentilles" className="text-black">Lentilles</option>
+          <option value="">Toutes</option>
+          <option value="Homme">Homme</option>
+          <option value="Femme">Femme</option>
+          <option value="Enfant">Enfant</option>
+          <option value="Lentilles">Lentilles</option>
         </select>
       </div>
 
       {/* Erreur */}
-      {erreur && (
-        <div className="mb-4 text-red-600 font-medium">{erreur}</div>
-      )}
+      {erreur && <div className="mb-4 text-red-600 font-medium">{erreur}</div>}
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 rounded-lg text-black">
           <thead className="bg-gray-100">
             <tr>
+              <th className="py-2 px-4 text-left">Image</th>
               <th className="py-2 px-4 text-left">Nom</th>
               <th className="py-2 px-4 text-left">Description</th>
               <th className="py-2 px-4 text-left">Prix</th>
@@ -125,32 +131,32 @@ export default function ProduitsPage() {
           <tbody>
             {chargement ? (
               <tr>
-                <td colSpan={6} className="text-center py-4">
+                <td colSpan={7} className="text-center py-4">
                   Chargement...
                 </td>
               </tr>
             ) : produits.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-4 text-gray-500">
+                <td colSpan={7} className="text-center py-4 text-gray-500">
                   Aucun produit trouvé
                 </td>
               </tr>
             ) : (
               produits.map((produit) => (
                 <tr key={produit.id} className="border-t hover:bg-gray-50">
+                  {/* Image */}
+                  <td className="py-2 px-4">
+                    <img
+                      src={produit.images?.[0] || "/images/default.jpg"}
+                      alt={produit.nom}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                  </td>
                   <td className="py-2 px-4">{produit.nom}</td>
-                  <td className="py-2 px-4">
-                    {produit.description || "-"}
-                  </td>
-                  <td className="py-2 px-4">
-                    {produit.prix} DA
-                  </td>
-                  <td className="py-2 px-4">
-                    {produit.categorie || "-"}
-                  </td>
-                  <td className="py-2 px-4">
-                    {produit.stock ?? 0}
-                  </td>
+                  <td className="py-2 px-4">{produit.description || "-"}</td>
+                  <td className="py-2 px-4">{produit.prix} DA</td>
+                  <td className="py-2 px-4">{produit.categorie || "-"}</td>
+                  <td className="py-2 px-4">{produit.stock ?? 0}</td>
                   <td className="py-2 px-4 text-center space-x-2">
                     <button
                       onClick={() => modifierProduit(produit.id)}
@@ -173,4 +179,4 @@ export default function ProduitsPage() {
       </div>
     </div>
   );
-} 
+}  

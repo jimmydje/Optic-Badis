@@ -14,7 +14,7 @@ export async function signInWithEmail(
     return { error: 'Email and password are required.' };
   }
   
-  const { user, error } = await auth.signIn.email({
+  const { data, error } = await auth.signIn.email({
     email,
     password,
   });
@@ -24,12 +24,14 @@ export async function signInWithEmail(
   }
 
   // 🔐 sécurité (au cas où user est null)
-  if (!user) {
+  if (!data?.user) {
     return { error: 'User not found.' };
   }
 
+  const user = data.user;
+
   // ✅ redirection selon rôle
-  if (user.role === 'admin') {
+  if ((user as { role?: string }).role === 'admin') {
     redirect('/admin');
   }
 
