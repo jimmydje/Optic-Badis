@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Produit {
@@ -10,28 +10,25 @@ interface Produit {
   prix: number;
   categorie?: string;
   stock?: number;
-  images?: string[]; // optionnel, pour éviter undefined
+  images?: string[];
 }
 
 export default function ProduitsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams(); // ✅ Next.js client
+  const search = searchParams.get("search") || ""; // récupérer search param
+
   const [produits, setProduits] = useState<Produit[]>([]);
   const [chargement, setChargement] = useState(true);
   const [categorie, setCategorie] = useState("");
   const [erreur, setErreur] = useState("");
-  const [search, setSearch] = useState("");
 
-  // Récupérer searchParams côté client depuis l'URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSearch(params.get("search") ?? "");
-  }, []);
-
-  // Fetch des produits
+  // 🔽 fetch produits côté client
   useEffect(() => {
     const fetchProduits = async () => {
       setChargement(true);
       setErreur("");
+
       try {
         const url = new URL("/api/produits", window.location.origin);
         if (categorie) url.searchParams.set("categorie", categorie);
@@ -40,11 +37,17 @@ export default function ProduitsPage() {
         const res = await fetch(url.toString());
         const data = await res.json();
 
-        if (!res.ok) {
-          throw new Error(data.error || "Erreur serveur");
-        }
+        if (!res.ok) throw new Error(data.error || "Erreur serveur");
 
-        setProduits(Array.isArray(data) ? data : []);
+        // ✅ nettoyer les images vides
+        const cleanData = Array.isArray(data)
+          ? data.map((p) => ({
+              ...p,
+              images: p.images?.filter((img: string) => img?.trim() !== "") || [],
+            }))
+          : [];
+
+        setProduits(cleanData);
       } catch (err) {
         console.error(err);
         setErreur("Impossible de charger les produits.");
@@ -56,6 +59,7 @@ export default function ProduitsPage() {
     fetchProduits();
   }, [categorie, search]);
 
+  // 🔽 supprimer produit
   const supprimerProduit = async (id: string) => {
     if (!confirm("Voulez-vous vraiment supprimer ce produit ?")) return;
 
@@ -66,24 +70,22 @@ export default function ProduitsPage() {
         body: JSON.stringify({ id }),
       });
 
-      if (res.ok) {
-        setProduits(produits.filter((p) => p.id !== id));
-      } else {
-        alert("Erreur lors de la suppression");
-      }
+      if (res.ok) setProduits(produits.filter((p) => p.id !== id));
+      else alert("Erreur lors de la suppression");
     } catch (err) {
       console.error(err);
       alert("Erreur serveur");
     }
   };
 
+  // 🔽 modifier produit
   const modifierProduit = (id: string) => {
     router.push(`/admin/produits/modifier/${id}`);
   };
 
   return (
     <div className="p-6 bg-white text-black rounded-lg shadow-sm">
-      {/* Header */}
+      {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Produits</h1>
         <button
@@ -94,7 +96,7 @@ export default function ProduitsPage() {
         </button>
       </div>
 
-      {/* Filtre */}
+      {/* FILTRE */}
       <div className="mb-4 flex items-center gap-4">
         <label className="font-medium">Filtrer par catégorie :</label>
         <select
@@ -110,10 +112,10 @@ export default function ProduitsPage() {
         </select>
       </div>
 
-      {/* Erreur */}
+      {/* ERREUR */}
       {erreur && <div className="mb-4 text-red-600 font-medium">{erreur}</div>}
 
-      {/* Table */}
+      {/* TABLE */}
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 rounded-lg text-black">
           <thead className="bg-gray-100">
@@ -142,41 +144,45 @@ export default function ProduitsPage() {
                 </td>
               </tr>
             ) : (
-              produits.map((produit) => (
-                <tr key={produit.id} className="border-t hover:bg-gray-50">
-                  {/* Image */}
-                  <td className="py-2 px-4">
-                    <img
-                      src={produit.images?.[0] || "/images/default.jpg"}
-                      alt={produit.nom}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  </td>
-                  <td className="py-2 px-4">{produit.nom}</td>
-                  <td className="py-2 px-4">{produit.description || "-"}</td>
-                  <td className="py-2 px-4">{produit.prix} DA</td>
-                  <td className="py-2 px-4">{produit.categorie || "-"}</td>
-                  <td className="py-2 px-4">{produit.stock ?? 0}</td>
-                  <td className="py-2 px-4 text-center space-x-2">
-                    <button
-                      onClick={() => modifierProduit(produit.id)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Modifier
-                    </button>
-                    <button
-                      onClick={() => supprimerProduit(produit.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Supprimer
-                    </button>
-                  </td>
-                </tr>
-              ))
+              produits.map((produit) => {
+                const imageSrc =
+                  produit.images?.[0]?.trim() || "/images/default.jpg";
+
+                return (
+                  <tr key={produit.id} className="border-t hover:bg-gray-50">
+                    <td className="py-2 px-4">
+                      <img
+                        src={imageSrc}
+                        alt={produit.nom}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    </td>
+                    <td className="py-2 px-4">{produit.nom}</td>
+                    <td className="py-2 px-4">{produit.description || "-"}</td>
+                    <td className="py-2 px-4">{produit.prix} DA</td>
+                    <td className="py-2 px-4">{produit.categorie || "-"}</td>
+                    <td className="py-2 px-4">{produit.stock ?? 0}</td>
+                    <td className="py-2 px-4 text-center space-x-2">
+                      <button
+                        onClick={() => modifierProduit(produit.id)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Modifier
+                      </button>
+                      <button
+                        onClick={() => supprimerProduit(produit.id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
     </div>
   );
-}  
+}

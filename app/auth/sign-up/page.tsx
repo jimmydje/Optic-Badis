@@ -1,9 +1,13 @@
 'use client';
+
 import { useActionState } from 'react';
 import { signUpWithEmail } from './actions';
 
 export default function SignUpForm() {
   const [state, formAction, isPending] = useActionState(signUpWithEmail, null);
+
+  const inputClass =
+    "w-sm rounded-md bg-white text-black placeholder-gray-500 px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400";
 
   return (
     <form
@@ -25,7 +29,7 @@ export default function SignUpForm() {
           type="text"
           required
           placeholder="John Doe"
-          className="input"
+          className={inputClass}
         />
       </div>
 
@@ -38,7 +42,7 @@ export default function SignUpForm() {
           type="tel"
           required
           placeholder="0550 00 00 00"
-          className="input"
+          className={inputClass}
         />
       </div>
 
@@ -51,7 +55,7 @@ export default function SignUpForm() {
           type="text"
           required
           placeholder="Algiers"
-          className="input"
+          className={inputClass}
         />
       </div>
 
@@ -64,7 +68,7 @@ export default function SignUpForm() {
           type="text"
           required
           placeholder="Street, building..."
-          className="input"
+          className={inputClass}
         />
       </div>
 
@@ -77,7 +81,7 @@ export default function SignUpForm() {
           type="email"
           required
           placeholder="john@mail.com"
-          className="input"
+          className={inputClass}
         />
       </div>
 
@@ -90,7 +94,7 @@ export default function SignUpForm() {
           type="password"
           required
           placeholder="*****"
-          className="input"
+          className={inputClass}
         />
       </div>
 
@@ -102,7 +106,7 @@ export default function SignUpForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-sm rounded-md bg-indigo-500 py-2 text-white hover:bg-indigo-400"
+        className="w-sm rounded-md bg-indigo-500 py-2 text-black hover:bg-indigo-400 disabled:opacity-50"
       >
         {isPending ? 'Creating account...' : 'Create Account'}
       </button>

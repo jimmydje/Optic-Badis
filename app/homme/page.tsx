@@ -5,7 +5,7 @@ import Link from "next/link";
 
 interface Product {
   id: string;
-  images: string[]; // tableau d’images
+  images: string[];
   nom: string;
   marque?: string;
   prix: number;
@@ -58,15 +58,33 @@ export default function HommePage() {
     alert(`✅ ${product.nom} ajouté au panier`);
   };
 
+  // 🔽 FILTRAGE + TRI
   let filtered = [...products];
-  if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
-  if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
-  if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
-  if (sort === "date-new") filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
+  if (marqueFilter) {
+    filtered = filtered.filter((p) => p.marque === marqueFilter);
+  }
+
+  if (sort === "price-asc") {
+    filtered.sort((a, b) => a.prix - b.prix);
+  }
+
+  if (sort === "price-desc") {
+    filtered.sort((a, b) => b.prix - a.prix);
+  }
+
+  if (sort === "date-new") {
+    filtered.sort(
+      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+    );
+  }
+
+  // 🔽 PAGINATION
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
-  const marques = Array.from(new Set(products.map((p) => p.marque).filter(Boolean)));
+  const marques = Array.from(
+    new Set(products.map((p) => p.marque).filter(Boolean))
+  );
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
@@ -95,12 +113,17 @@ export default function HommePage() {
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
-            <option key={m} value={m}>{m}</option>
+            <option key={m} value={m}>
+              {m}
+            </option>
           ))}
         </select>
 
         <button
-          onClick={() => { setSort(""); setMarqueFilter(""); }}
+          onClick={() => {
+            setSort("");
+            setMarqueFilter("");
+          }}
           className="px-6 py-3 rounded-xl bg-white text-black hover:bg-neutral-200 transition"
         >
           Réinitialiser
@@ -111,68 +134,79 @@ export default function HommePage() {
       {loading ? (
         <p className="text-center text-neutral-400">Chargement...</p>
       ) : visibleProducts.length === 0 ? (
-        <p className="text-center text-neutral-400">Aucun produit trouvé.</p>
+        <p className="text-center text-neutral-400">
+          Aucun produit trouvé.
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
-          {visibleProducts.map((product) => (
-            <div
-              key={product.id}
-              className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
-            >
-              <Link href={`/homme/${product.id}`}>
-                <img
-                  // 🔹 Affiche la première image du tableau
-                  src={product.images?.[0] || "/placeholder.jpg"}
-                  alt={product.nom}
-                  className="h-64 w-full object-cover group-hover:scale-105 transition"
-                />
-              </Link>
+          {visibleProducts.map((product) => {
+            // ✅ FIX IMAGE (IMPORTANT)
+            const imageSrc =
+              product.images?.[0]?.trim()
+                ? product.images[0]
+                : "/placeholder.jpg";
 
-              <div className="p-6">
+            return (
+              <div
+                key={product.id}
+                className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
+              >
                 <Link href={`/homme/${product.id}`}>
-                  <h3 className="text-lg font-medium hover:underline">
-                    {product.nom}
-                  </h3>
+                  <img
+                    src={imageSrc}
+                    alt={product.nom}
+                    className="h-64 w-full object-cover group-hover:scale-105 transition"
+                  />
                 </Link>
 
-                {product.marque && (
-                  <p className="text-sm text-neutral-400 mt-1">
-                    {product.marque}
+                <div className="p-6">
+                  <Link href={`/homme/${product.id}`}>
+                    <h3 className="text-lg font-medium hover:underline">
+                      {product.nom}
+                    </h3>
+                  </Link>
+
+                  {product.marque && (
+                    <p className="text-sm text-neutral-400 mt-1">
+                      {product.marque}
+                    </p>
+                  )}
+
+                  <p className="text-xl font-semibold mt-3">
+                    {product.prix} DA
                   </p>
-                )}
 
-                <p className="text-xl font-semibold mt-3">
-                  {product.prix} DA 
-                </p>
-
-                <button
-                  onClick={() => addToCart(product)}
-                  className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition"
-                >
-                  Ajouter au panier
-                </button>
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition"
+                  >
+                    Ajouter au panier
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* PAGINATION */}
       <div className="flex justify-center mt-16 gap-2">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-          <button
-            key={num}
-            onClick={() => setPage(num)}
-            className={`px-4 py-2 rounded-full ${
-              page === num
-                ? "bg-white text-black"
-                : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-            } transition`}
-          >
-            {num}
-          </button>
-        ))}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+          (num) => (
+            <button
+              key={num}
+              onClick={() => setPage(num)}
+              className={`px-4 py-2 rounded-full ${
+                page === num
+                  ? "bg-white text-black"
+                  : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+              } transition`}
+            >
+              {num}
+            </button>
+          )
+        )}
       </div>
     </main>
   );
-} 
+}  

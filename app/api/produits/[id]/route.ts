@@ -1,25 +1,23 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-const CATEGORIES_AUTORISEES = [
-  "Homme",
-  "Femme",
-  "Enfant",
-  "Lentilles",
-  "solaire.homme",
-  "solaire.femme",
-];  
- 
 // 🔹 GET
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+  const { id } = await context.params; // ✅ IMPORTANT FIX
+
+  if (!id) {
+    return NextResponse.json(
+      { error: "ID manquant" },
+      { status: 400 }
+    );
+  }
 
   try {
     const produit = await prisma.produit.findUnique({
-      where: { id },
+      where: { id }, // ✅ PLUS undefined
     });
 
     if (!produit) {
@@ -31,7 +29,10 @@ export async function GET(
 
     return NextResponse.json(produit);
   } catch (error) {
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur serveur" },
+      { status: 500 }
+    );
   }
 }
 
@@ -40,35 +41,36 @@ export async function PUT(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-  const body = await req.json();
+  const { id } = await context.params; // ✅ FIX IMPORTANT
 
-  if (
-    body.categorie &&
-    !CATEGORIES_AUTORISEES.includes(body.categorie)
-  ) {
+  if (!id) {
     return NextResponse.json(
-      { error: "Catégorie invalide" },
+      { error: "ID manquant" },
       { status: 400 }
     );
   }
 
+  const body = await req.json();
+
   try {
     const updated = await prisma.produit.update({
-      where: { id },
+      where: { id }, // ✅ FIX
       data: {
         nom: body.nom,
         description: body.description ?? null,
-        prix: body.prix ? Number(body.prix) : undefined,
-        categorie: body.categorie ?? undefined,
-        stock: body.stock ?? undefined,
-        images: body.images ?? undefined, // ✅ IMPORTANT (tableau)
+        prix: Number(body.prix),
+        categorie: body.categorie,
+        stock: Number(body.stock),
+        images: body.images,
       },
     });
 
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur update produit" },
+      { status: 500 }
+    );
   }
 }
 
@@ -77,7 +79,7 @@ export async function DELETE(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+  const { id } = await context.params; // ✅ FIX
 
   try {
     await prisma.produit.delete({
@@ -86,6 +88,9 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Produit supprimé" });
   } catch (error) {
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur suppression" },
+      { status: 500 }
+    );
   }
-}
+}  

@@ -1,48 +1,54 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShoppingCart, Search, Menu, X, LogOut } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { authClient } from '@/lib/auth/client';
- 
-// Server components using auth methods must be rendered dynamically
-export const dynamic = 'force-dynamic';
+import { authClient } from "@/lib/auth/client";
 
 export default function Navbar() {
   const { data: session } = authClient.useSession();
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [submenuOpen, setSubmenuOpen] = useState<{ [key: string]: boolean }>({});
 
   const router = useRouter();
   const pathname = usePathname();
 
-  // 🔥 Logout function
   const handleLogout = async () => {
     await authClient.signOut();
-    router.push('/');
+    router.push("/");
   };
-
-  // Cacher navbar dans admin
-  if (pathname.startsWith("/admin")) return null;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!search.trim()) return;
-    router.push(`/produits?search=${search}`);
+    router.push(`/search?q=${encodeURIComponent(search)}`);
     setSearch("");
     setMobileOpen(false);
   };
 
+  const toggleSubmenu = (key: string) => {
+    setSubmenuOpen(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const linkClass = (path: string) =>
     `px-4 py-2 rounded-xl transition cursor-pointer ${
-      pathname.startsWith(path)
+      pathname?.startsWith(path)
         ? "text-[#DAAB3A]"
         : "text-white hover:text-[#DAAB3A]"
     }`;
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMobileOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <nav className="bg-[#0E0E0F] text-white px-6 py-4 shadow-md">
+    <nav className="bg-[#0E0E0F] text-white px-6 py-4 shadow-md relative z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
 
         {/* Logo */}
@@ -52,8 +58,7 @@ export default function Navbar() {
             <p className="text-xs text-gray-400">VOTRE VISION, NOTRE PASSION</p>
           </div>
         </Link>
-
-        {/* Desktop menu */}
+  {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-4">
 
           {/* Lunettes de vue */}
@@ -64,13 +69,13 @@ export default function Navbar() {
                 <h3 className="font-semibold mb-2">Catégories</h3>
                 <ul className="flex flex-col gap-2">
                   <li>
-                    <Link href="/homme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue homme</Link>
+                    <Link href="/homme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Homme</Link>
                   </li>
                   <li>
-                    <Link href="/femme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue femme</Link>
+                    <Link href="/femme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Femme</Link>
                   </li>
                   <li>
-                    <Link href="/enfants" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Lunettes de vue enfant</Link>
+                    <Link href="/enfants" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Enfants</Link>
                   </li>
                 </ul>
               </div>
@@ -85,10 +90,10 @@ export default function Navbar() {
                 <h3 className="font-semibold mb-2">Catégories</h3>
                 <ul className="flex flex-col gap-2">
                   <li>
-                    <span className="block px-2 py-1 rounded hover:text-[#DAAB3A] cursor-pointer">Homme</span>
+                    <Link href="/solaire.homme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Homme</Link>
                   </li>
                   <li>
-                    <span className="block px-2 py-1 rounded hover:text-[#DAAB3A] cursor-pointer">Femme</span>
+                    <Link href="/solaire.femme" className="block px-2 py-1 rounded hover:text-[#DAAB3A]">Femme</Link>
                   </li>
                 </ul>
               </div>
@@ -98,7 +103,7 @@ export default function Navbar() {
           {/* Lentilles */}
           <Link href="/lentilles" className={linkClass("/lentilles")}>Lentilles</Link>
 
-          {/* Recherche */}
+          {/* Recherche desktop */}
           <form onSubmit={handleSearch} className="flex items-center bg-white rounded-xl px-3 py-2 shadow-sm">
             <input
               type="text"
@@ -112,8 +117,11 @@ export default function Navbar() {
             </button>
           </form>
 
+
+         
+
           {/* Panier */}
-          <Link href="/panier" className={`flex items-center gap-2 ${linkClass("/panier")}`}>
+          <Link href="/panier" className="flex items-center gap-2">
             <ShoppingCart size={18} />
             Panier
           </Link>
@@ -121,24 +129,28 @@ export default function Navbar() {
           {/* Auth */}
           {session?.user ? (
             <div className="flex items-center gap-3">
-
-              <span className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium">
+              <span className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black">
                 {session.user.name}
               </span>
 
+              {/* Lien admin si admin */}
+              {session.user.role?.toLowerCase() === "admin" && (
+                <Link href="/admin" className="text-[#DAAB3A] font-semibold">
+                  Admin
+                </Link>
+              )}
+
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-xl bg-red-500 hover:bg-red-600 transition"
-                title="Se déconnecter"
+                className="p-2 rounded-xl bg-red-500 hover:bg-red-600"
               >
-                <LogOut size={18} className="text-white" />
+                <LogOut size={18} />
               </button>
-
             </div>
           ) : (
             <Link
               href="/auth/sign-in"
-              className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black font-medium hover:bg-[#c99a2e]"
+              className="px-4 py-2 rounded-xl bg-[#DAAB3A] text-black"
             >
               Sign in
             </Link>
@@ -146,27 +158,10 @@ export default function Navbar() {
         </div>
 
         {/* Mobile button */}
-        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden">
           {mobileOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden mt-4 flex flex-col gap-3 bg-[#111113] p-4 rounded-xl">
-          <span className="font-medium text-white">Lunettes de vue</span>
-          <Link href="/homme" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Homme</Link>
-          <Link href="/femme" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Femme</Link>
-          <Link href="/enfants" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Enfants</Link>
-
-          <span className="font-medium text-white mt-2">Lunettes de soleil</span>
-          <span className="px-4 py-2 text-white cursor-pointer hover:text-[#DAAB3A]">Homme</span>
-          <span className="px-4 py-2 text-white cursor-pointer hover:text-[#DAAB3A]">Femme</span>
-
-          <Link href="/lentilles" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Lentilles</Link>
-          <Link href="/panier" onClick={()=>setMobileOpen(false)} className="px-4 py-2 text-white hover:text-[#DAAB3A]">Panier</Link>
-        </div>
-      )}
     </nav>
   );
-}
+} 

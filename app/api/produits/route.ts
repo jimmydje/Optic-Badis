@@ -1,7 +1,8 @@
+// /api/produits.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// ✅ Catégories exactes
+// ✅ Catégories autorisées
 const CATEGORIES_AUTORISEES = [
   "Homme",
   "Femme",
@@ -20,9 +21,7 @@ export async function GET(req: Request) {
 
     const categorie = searchParams.get("categorie");
     const sort = searchParams.get("sort");
-    const search = searchParams.get("search");
-
-    // 🔥 FIX limit sécurisé
+    const search = searchParams.get("search")?.toLowerCase();
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam) : undefined;
 
@@ -33,28 +32,25 @@ export async function GET(req: Request) {
       );
     }
 
-    // 🔥 FIX createdAt (remplacé par id si problème)
+    // Tri
     let orderBy: any = { id: "desc" };
-
     if (sort === "prix-asc") orderBy = { prix: "asc" };
     if (sort === "prix-desc") orderBy = { prix: "desc" };
 
     // Filtre
     let where: any = {};
+    if (categorie) where.categorie = categorie;
 
-    if (categorie) {
-      where.categorie = categorie;
-    }
-
-    // 🔥 FIX search (évite crash si description null)
+    // Recherche avancée
     if (search) {
       where.OR = [
         { nom: { contains: search, mode: "insensitive" } },
         { description: { contains: search, mode: "insensitive" } },
+        { marque: { contains: search, mode: "insensitive" } },
+        { categorie: { contains: search, mode: "insensitive" } },
       ];
     }
 
-    // 🔥 FIX take undefined
     const produits = await prisma.produit.findMany({
       where,
       orderBy,
@@ -65,9 +61,8 @@ export async function GET(req: Request) {
 
   } catch (error) {
     console.error("🔥 ERREUR GET PRODUITS :", error);
-
     return NextResponse.json(
-      { error: String(error) }, // 🔥 très important pour debug
+      { error: String(error) },
       { status: 500 }
     );
   }
@@ -79,6 +74,7 @@ export async function GET(req: Request) {
 interface ProduitBody {
   nom: string;
   description?: string;
+  marque?: string;
   prix: number;
   categorie?: string;
   stock?: number;
@@ -88,7 +84,7 @@ interface ProduitBody {
 export async function POST(req: Request) {
   try {
     const data: ProduitBody = await req.json();
-    const { nom, description, prix, categorie, stock, images } = data;
+    const { nom, description, marque, prix, categorie, stock, images } = data;
 
     if (!nom || prix === undefined || prix === null) {
       return NextResponse.json(
@@ -115,6 +111,7 @@ export async function POST(req: Request) {
       data: {
         nom,
         description: description || null,
+        marque: marque || null,
         prix: Number(prix),
         categorie: categorie || null,
         stock: stock ?? 0,
@@ -126,7 +123,6 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error("🔥 ERREUR POST PRODUIT :", error);
-
     return NextResponse.json(
       { error: String(error) },
       { status: 500 }
@@ -158,7 +154,6 @@ export async function DELETE(req: Request) {
 
   } catch (error) {
     console.error("🔥 ERREUR DELETE PRODUIT :", error);
-
     return NextResponse.json(
       { error: String(error) },
       { status: 500 }

@@ -18,13 +18,9 @@ interface Product {
 
 export default function ProduitDetailPage() {
   const { id } = useParams();
-
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [mainImageIndex, setMainImageIndex] = useState(0);
-
-  // ✅ toast warning
-  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -33,7 +29,6 @@ export default function ProduitDetailPage() {
       try {
         const res = await fetch(`/api/produits/${id}`);
         if (!res.ok) throw new Error("Produit introuvable");
-
         const data = await res.json();
         setProduct(data);
       } catch (error) {
@@ -46,62 +41,29 @@ export default function ProduitDetailPage() {
     fetchProduct();
   }, [id]);
 
-  // ✅ ADD TO CART + WARNING
-  function addToCart(product: Product) {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    const existingIndex = cart.findIndex(
-      (item: any) => item.id === product.id
-    );
-
-    if (existingIndex !== -1) {
-      cart[existingIndex].quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    // 🔔 WARNING
-    setToast("Produit ajouté au panier ✔");
-
-    setTimeout(() => {
-      setToast(null);
-    }, 2000);
-  }
-
-  if (loading)
-    return <p className="p-6 text-center text-white">Chargement...</p>;
-
-  if (!product)
-    return <p className="p-6 text-center text-white">Produit introuvable.</p>;
-
-  const images = product.images || [];
+  if (loading) return <p className="p-6 text-center">Chargement...</p>;
+  if (!product) return <p className="p-6 text-center">Produit introuvable.</p>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10 text-white">
+    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
 
       {/* ---- IMAGE ---- */}
       <div className="flex flex-col items-center justify-center gap-4">
-        {images.length > 0 ? (
+        {product.images.length > 0 && (
           <div className="relative w-full h-[420px]">
             <Image
-              src={images[mainImageIndex]}
+              src={product.images[mainImageIndex]}
               alt={product.nom}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-contain drop-shadow-xl"
             />
           </div>
-        ) : (
-          <div className="w-full h-[420px] flex items-center justify-center">
-            No image available
-          </div>
         )}
 
         {/* Miniatures */}
         <div className="flex gap-2 mt-4">
-          {images.map((img, idx) => (
+          {product.images.map((img, idx) => (
             <div
               key={idx}
               onClick={() => setMainImageIndex(idx)}
@@ -116,6 +78,7 @@ export default function ProduitDetailPage() {
                 alt={`${product.nom} ${idx + 1}`}
                 width={64}
                 height={64}
+                sizes="64px"
                 className="object-cover"
               />
             </div>
@@ -138,26 +101,22 @@ export default function ProduitDetailPage() {
 
         {/* PRIX */}
         <div className="flex items-center gap-4">
-          <p className="text-3xl font-bold">
-            {product.prix ?? 0} DA
+          <p className="text-3xl font-bold text-white">
+            {product.prix} DA
           </p>
-
-          <p className="text-xl line-through text-gray-300">
-            DA 4,900.00
-          </p>
-
+          <p className="text-xl line-through text-white">DA 4,900.00</p>
           <span className="bg-[#DAAB3A] text-white text-sm px-3 py-1 rounded-full">
             SAVE - DA 500
           </span>
         </div>
 
-        {/* WARNING badge */}
+        {/* Badge */}
         <div className="bg-red-100 text-red-600 border border-red-300 px-4 py-2 rounded-lg w-fit font-medium">
           ⚠️ Attention : édition limitée
         </div>
 
         {/* LISTE */}
-        <ul className="list-disc pl-5 space-y-1">
+        <ul className="list-disc pl-5 space-y-1 text-white">
           <li>Design confortable et léger</li>
           <li>Matériaux premium</li>
           <li>Protection UV</li>
@@ -167,28 +126,18 @@ export default function ProduitDetailPage() {
         </ul>
 
         {/* BOUTON */}
-        <button
-          onClick={() => addToCart(product)}
-          className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition"
-        >
+        <button className="w-full bg-[#DAAB3A] text-white py-3 rounded-xl text-lg shadow-md hover:bg-[#c89b2f] transition">
           Ajouter au panier
         </button>
 
         {/* DESCRIPTION */}
         {product.description && (
-          <div className="pt-4">
+          <div className="pt-4 text-white">
             <h2 className="text-xl font-semibold mb-2">Description</h2>
             <p>{product.description}</p>
           </div>
         )}
       </div>
-
-      {/* 🔔 TOAST WARNING */}
-      {toast && (
-        <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
-          {toast}
-        </div>
-      )}
     </div>
   );
 }  
