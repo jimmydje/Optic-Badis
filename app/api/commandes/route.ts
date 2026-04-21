@@ -6,17 +6,18 @@ function formatCommande(cmd: any) {
   return {
     id: cmd.id,
     client: cmd.client,
+    clientId: cmd.clientId,
     total: cmd.total,
     statut: cmd.statut,
     date: cmd.date,
 
-    produits: cmd.items.map((item: any) => ({
+    produits: cmd.items?.map((item: any) => ({
       id: item.produitId,
       nom: item.nom,
       prix: item.prix,
       image: item.image,
       quantite: item.quantite,
-    })),
+    })) || [],
   };
 }
 
@@ -26,7 +27,7 @@ export async function GET() {
     const commandes = await prisma.commande.findMany({
       include: {
         client: true,
-        items: true,
+        items: true, // ✅ snapshot déjà dedans
       },
       orderBy: { date: "desc" },
     });
@@ -56,10 +57,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ créer ou update client
+    // ✅ UPSERT client
     const clientCreated = await prisma.client.upsert({
       where: { email: client.email },
-      update: { nom: client.nom, telephone: client.telephone },
+      update: {
+        nom: client.nom,
+        telephone: client.telephone,
+      },
       create: {
         nom: client.nom,
         email: client.email,
@@ -69,6 +73,7 @@ export async function POST(req: Request) {
 
     // ✅ récupérer produits
     const produitsIds = items.map((i: any) => i.produitId);
+
     const produits = await prisma.produit.findMany({
       where: { id: { in: produitsIds } },
     });
@@ -80,10 +85,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ calcul total
-    const total = produits.reduce((sum, p) => {
-      const item = items.find((i: any) => i.produitId === p.id);
-      return sum + p.prix * (item?.quantite || 1);
+    // ✅ calcul total sécurisé
+    const total = items.reduce((sum: number, item: any) => {
+      const produit = produits.find((p) => p.id === item.produitId);
+      if (!produit) return sum;
+      return sum + produit.prix * (item.quantite || 1);
     }, 0);
 
     // ✅ création commande avec snapshot
@@ -95,7 +101,7 @@ export async function POST(req: Request) {
 
         items: {
           create: items.map((i: any) => {
-            const produit = produits.find(p => p.id === i.produitId);
+            const produit = produits.find((p) => p.id === i.produitId);
 
             if (!produit) {
               throw new Error("Produit introuvable");
@@ -105,7 +111,7 @@ export async function POST(req: Request) {
               produitId: produit.id,
               quantite: i.quantite || 1,
 
-              // 🔥 SNAPSHOT OBLIGATOIRE
+              // 🔥 SNAPSHOT (clé du succès)
               nom: produit.nom,
               prix: produit.prix,
               image: produit.images?.[0] || null,
@@ -119,8 +125,9 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(formatCommande(newCommande), { status: 201 });
-
+    return NextResponse.json(formatCommande(newCommande), {
+      status: 201,
+    });
   } catch (error) {
     console.error("❌ POST commande :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
@@ -161,21 +168,29 @@ export async function DELETE(req: Request) {
     const { id } = await req.json();
 
     if (!id) {
-      return NextResponse.json({ error: "ID manquant." }, { status: 400 });
+      return NextResponse.json(
+        { error: "ID manquant." },
+        { status: 400 }
+      );
     }
+
+    // 🔥 Supprimer les items d'abord (sécurité)
+    await prisma.commandeItem.deleteMany({
+      where: { commandeId: id },
+    });
 
     await prisma.commande.delete({
       where: { id },
     });
 
-    return NextResponse.json({ message: "Commande supprimée" });
-
+    return NextResponse.json({
+      message: "Commande supprimée",
+    });
   } catch (error) {
     console.error("❌ DELETE commande :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }   
-
 
 
 

@@ -25,9 +25,7 @@ export default function SolaireHommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // ✅ FIX catégorie (ALIGNÉ AVEC API + DB)
         const res = await fetch("/api/produits?categorie=solaire.homme");
-
         const data = await res.json();
 
         if (!res.ok) {
@@ -38,11 +36,10 @@ export default function SolaireHommePage() {
         if (Array.isArray(data)) {
           setProducts(data);
         } else {
-          console.error("Format invalide :", data);
           setProducts([]);
         }
       } catch (err) {
-        console.error("Erreur fetch :", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -51,7 +48,7 @@ export default function SolaireHommePage() {
     fetchProducts();
   }, []);
 
-  // ✅ reset page si filtre change
+  // reset page si filtre change
   useEffect(() => {
     setPage(1);
   }, [sort, marqueFilter]);
@@ -61,6 +58,7 @@ export default function SolaireHommePage() {
     let cart = existing ? JSON.parse(existing) : [];
 
     const existingItem = cart.find((item: any) => item.id === product.id);
+
     if (existingItem) {
       existingItem.quantite += 1;
     } else {
@@ -76,14 +74,28 @@ export default function SolaireHommePage() {
     alert(`✅ ${product.nom} ajouté au panier`);
   };
 
+  // 🔽 FILTRES + TRI
   let filtered = [...products];
 
-  if (marqueFilter) filtered = filtered.filter((p) => p.marque === marqueFilter);
-  if (sort === "price-asc") filtered.sort((a, b) => a.prix - b.prix);
-  if (sort === "price-desc") filtered.sort((a, b) => b.prix - a.prix);
-  if (sort === "date-new")
-    filtered.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  if (marqueFilter) {
+    filtered = filtered.filter((p) => p.marque === marqueFilter);
+  }
 
+  if (sort === "price-asc") {
+    filtered.sort((a, b) => a.prix - b.prix);
+  }
+
+  if (sort === "price-desc") {
+    filtered.sort((a, b) => b.prix - a.prix);
+  }
+
+  if (sort === "date-new") {
+    filtered.sort(
+      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+    );
+  }
+
+  // 🔽 PAGINATION
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
 
@@ -94,17 +106,20 @@ export default function SolaireHommePage() {
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white px-6 py-20">
+    <main className="min-h-screen bg-neutral-100 text-black px-6 py-20">
+
+      {/* TITLE */}
       <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
         Lunettes Solaires Homme
       </h1>
 
       {/* FILTRES */}
       <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row gap-4 justify-between">
+
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3"
+          className="bg-white border border-neutral-300 rounded-xl px-4 py-3 text-black focus:outline-none"
         >
           <option value="">Trier par</option>
           <option value="price-asc">Prix croissant</option>
@@ -115,11 +130,13 @@ export default function SolaireHommePage() {
         <select
           value={marqueFilter}
           onChange={(e) => setMarqueFilter(e.target.value)}
-          className="bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3"
+          className="bg-white border border-neutral-300 rounded-xl px-4 py-3 text-black focus:outline-none"
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
-            <option key={m} value={m}>{m}</option>
+            <option key={m} value={m}>
+              {m}
+            </option>
           ))}
         </select>
 
@@ -128,7 +145,7 @@ export default function SolaireHommePage() {
             setSort("");
             setMarqueFilter("");
           }}
-          className="px-6 py-3 rounded-xl bg-white text-black hover:bg-neutral-200"
+          className="px-6 py-3 rounded-xl bg-[#212E53] text-white hover:opacity-90 transition"
         >
           Réinitialiser
         </button>
@@ -136,69 +153,92 @@ export default function SolaireHommePage() {
 
       {/* PRODUITS */}
       {loading ? (
-        <p className="text-center text-neutral-400">Chargement...</p>
+        <p className="text-center text-neutral-500">Chargement...</p>
       ) : visibleProducts.length === 0 ? (
-        <p className="text-center text-neutral-400">Aucun produit trouvé.</p>
+        <p className="text-center text-neutral-500">
+          Aucun produit trouvé.
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
-          {visibleProducts.map((product) => (
-            <div
-              key={product.id}
-              className="group bg-neutral-900 rounded-3xl overflow-hidden hover:bg-neutral-800 transition"
-            >
-              <Link href={`/solaire.homme/${product.id}`}>
-                <img
-                  src={product.images?.[0] || "https://via.placeholder.com/400"}
-                  alt={product.nom}
-                  className="h-64 w-full object-cover group-hover:scale-105 transition"
-                />
-              </Link>
+          {visibleProducts.map((product) => {
+            const imageSrc =
+              product.images?.[0]?.trim()
+                ? product.images[0]
+                : "/placeholder.jpg";
 
-              <div className="p-6">
-                <Link href={`/solaire.homme/${product.id}`}>
-                  <h3 className="text-lg font-medium hover:underline">
-                    {product.nom}
-                  </h3>
-                </Link>
+            return (
+              <div
+                key={product.id}
+                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer"
+              >
 
-                {product.marque && (
-                  <p className="text-sm text-neutral-400 mt-1">
-                    {product.marque}
+                {/* IMAGE */}
+                <div className="relative">
+                  <Link href={`/solaire/homme/${product.id}`}>
+                    <img
+                      src={imageSrc}
+                      alt={product.nom}
+                      className="h-64 w-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                  </Link>
+
+                  {/* BADGE */}
+                  <span className="absolute top-3 left-3 bg-[#212E53] text-white text-xs px-3 py-1 rounded-full">
+                    Nouveau
+                  </span>
+                </div>
+
+                {/* INFOS */}
+                <div className="p-6">
+                  <Link href={`/solaire/homme/${product.id}`}>
+                    <h3 className="text-lg font-medium hover:underline">
+                      {product.nom}
+                    </h3>
+                  </Link>
+
+                  {product.marque && (
+                    <p className="text-sm text-neutral-500 mt-1">
+                      {product.marque}
+                    </p>
+                  )}
+
+                  <p className="text-xl font-semibold mt-3 text-[#212E53]">
+                    {product.prix} DA
                   </p>
-                )}
 
-                <p className="text-xl font-semibold mt-3">
-                  {product.prix} DA
-                </p>
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="w-full mt-6 py-3 rounded-full bg-[#212E53] text-white hover:opacity-90 transition"
+                  >
+                    Ajouter au panier
+                  </button>
+                </div>
 
-                <button
-                  onClick={() => addToCart(product)}
-                  className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200"
-                >
-                  Ajouter au panier
-                </button>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {/* PAGINATION */}
       <div className="flex justify-center mt-16 gap-2">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-          <button
-            key={num}
-            onClick={() => setPage(num)}
-            className={`px-4 py-2 rounded-full ${
-              page === num
-                ? "bg-white text-black"
-                : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-            }`}
-          >
-            {num}
-          </button>
-        ))}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+          (num) => (
+            <button
+              key={num}
+              onClick={() => setPage(num)}
+              className={`px-4 py-2 rounded-full ${
+                page === num
+                  ? "bg-[#212E53] text-white"
+                  : "bg-white border border-neutral-300 text-neutral-600 hover:bg-neutral-200"
+              } transition`}
+            >
+              {num}
+            </button>
+          )
+        )}
       </div>
+
     </main>
   );
 }  

@@ -2,11 +2,19 @@
 
 import { useEffect, useState } from "react";
 
+interface ProduitCommande {
+  id: string;
+  nom: string;
+  prix: number;
+  quantite: number;
+  image?: string;
+}
+
 interface Commande {
   id: string;
   client: { nom: string } | null;
   clientId: string;
-  produits: { id: string; nom: string; prix: number; quantite: number }[];
+  produits: ProduitCommande[];
   total: number;
   statut: "En attente" | "En cours" | "Livrée" | "Annulée";
   date: string;
@@ -23,14 +31,11 @@ export default function CommandesPage() {
         const res = await fetch("/api/commandes");
         const data = await res.json();
 
-        // ✅ sécurisation (évite crash map)
         if (Array.isArray(data)) {
           setCommandes(data);
         } else {
-          console.error("Réponse invalide API :", data);
           setCommandes([]);
         }
-
       } catch (error) {
         console.error("Erreur lors du chargement :", error);
         setCommandes([]);
@@ -69,6 +74,27 @@ export default function CommandesPage() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    const confirmDelete = confirm("Supprimer cette commande ?");
+
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch("/api/commandes", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      setCommandes((prev) => prev.filter((cmd) => cmd.id !== id));
+    } catch (error) {
+      console.error(error);
+      alert("Erreur lors de la suppression.");
+    }
+  };
+
   if (loading) {
     return (
       <p className="text-center text-gray-500 mt-10">
@@ -82,7 +108,7 @@ export default function CommandesPage() {
       <h1 className="text-2xl font-semibold mb-6">Commandes</h1>
 
       <div className="bg-white p-6 rounded-xl shadow">
-        {!Array.isArray(commandes) || commandes.length === 0 ? (
+        {commandes.length === 0 ? (
           <p className="text-gray-500 text-center">
             Aucune commande pour le moment.
           </p>
@@ -95,6 +121,7 @@ export default function CommandesPage() {
                 <th className="py-2 px-3">Date</th>
                 <th className="py-2 px-3">Montant</th>
                 <th className="py-2 px-3">Statut</th>
+                <th className="py-2 px-3">Actions</th>
               </tr>
             </thead>
 
@@ -111,14 +138,37 @@ export default function CommandesPage() {
 
                   {/* Produits */}
                   <td className="py-2 px-3">
-                    {cmd.produits?.length > 0 ? (
+                    {cmd.produits.length > 0 ? (
                       cmd.produits.map((p, i) => (
-                        <div key={i}>
-                          {p.nom} x{p.quantite}
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 mb-2"
+                        >
+                          {p.image && (
+                            <img
+                              src={p.image}
+                              alt={p.nom}
+                              className="w-10 h-10 object-cover rounded"
+                            />
+                          )}
+
+                          <div>
+                            <div className="font-medium">
+                              {p.nom}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {p.quantite} × {p.prix} DA ={" "}
+                              <span className="font-semibold text-black">
+                                {p.quantite * p.prix} DA
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       ))
                     ) : (
-                      "—"
+                      <span className="text-gray-400">
+                        Aucun produit
+                      </span>
                     )}
                   </td>
 
@@ -130,7 +180,7 @@ export default function CommandesPage() {
                   </td>
 
                   {/* Total */}
-                  <td className="py-2 px-3">
+                  <td className="py-2 px-3 font-semibold">
                     {cmd.total?.toLocaleString()} DA
                   </td>
 
@@ -145,11 +195,13 @@ export default function CommandesPage() {
                         )
                       }
                       disabled={updating === cmd.id}
-                      className={`rounded-lg px-2 py-1 border ${
+                      className={`rounded-lg px-2 py-1 border outline-none ${
                         cmd.statut === "Livrée"
                           ? "bg-green-100 text-green-700"
                           : cmd.statut === "Annulée"
                           ? "bg-red-100 text-red-700"
+                          : cmd.statut === "En cours"
+                          ? "bg-blue-100 text-blue-700"
                           : "bg-yellow-100 text-yellow-700"
                       }`}
                     >
@@ -159,6 +211,16 @@ export default function CommandesPage() {
                       <option value="Annulée">Annulée</option>
                     </select>
                   </td>
+
+                  {/* Actions */}
+                  <td className="py-2 px-3">
+                    <button
+                      onClick={() => handleDelete(cmd.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm"
+                    >
+                      Supprimer
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -167,4 +229,4 @@ export default function CommandesPage() {
       </div>
     </div>
   );
-}   
+}  

@@ -13,7 +13,7 @@ export default function PanierPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Charger panier
+  // Charger panier
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
@@ -21,7 +21,7 @@ export default function PanierPage() {
     }
   }, []);
 
-  // ✅ Charger utilisateur connecté
+  // Charger utilisateur connecté
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -95,19 +95,18 @@ export default function PanierPage() {
     }
   };
 
-  // ⏳ Chargement
   if (loading) return null;
 
-  // 🛒 Panier vide
+  // Panier vide
   if (cart.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-[80vh] bg-black text-white">
+      <main className="flex flex-col items-center justify-center min-h-[80vh] bg-white text-black">
         <h1 className="text-3xl font-bold mb-4">🛒 Votre panier</h1>
-        <p className="text-gray-400">Votre panier est vide.</p>
+        <p className="text-gray-500">Votre panier est vide.</p>
 
         <a
           href="/"
-          className="mt-6 bg-yellow-500 text-black px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition"
+          className="mt-6 bg-[#212E53] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#1a2542] transition"
         >
           Continuer vos achats
         </a>
@@ -116,17 +115,17 @@ export default function PanierPage() {
   }
 
   return (
-    <main className="p-6 md:p-10 bg-black min-h-screen text-white">
+    <main className="p-6 md:p-10 bg-white min-h-screen text-black">
       <h1 className="text-3xl font-bold mb-8 text-center">
         🛍️ Votre panier
       </h1>
 
-      <div className="bg-[#111] rounded-xl shadow-lg p-6 border border-gray-800">
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
 
         {/* TABLEAU */}
         <table className="w-full text-left mb-8">
           <thead>
-            <tr className="border-b border-gray-700 text-gray-400">
+            <tr className="border-b border-gray-300 text-gray-600">
               <th className="py-2">Produit</th>
               <th className="py-2">Prix</th>
               <th className="py-2">Quantité</th>
@@ -136,15 +135,15 @@ export default function PanierPage() {
 
           <tbody>
             {cart.map((item) => (
-              <tr key={item.id} className="border-b border-gray-800">
-                <td className="py-3">{item.nom}</td>
+              <tr key={item.id} className="border-b border-gray-200">
+                <td className="py-3 font-medium">{item.nom}</td>
                 <td className="py-3">{item.prix} DA</td>
                 <td className="py-3">{item.quantite}</td>
 
                 <td className="py-3 text-right">
                   <button
                     onClick={() => removeFromCart(item.id)}
-                    className="text-red-400 hover:text-red-600"
+                    className="text-red-500 hover:text-red-700 transition"
                   >
                     Supprimer
                   </button>
@@ -158,8 +157,8 @@ export default function PanierPage() {
         <div className="grid md:grid-cols-2 gap-10">
 
           {/* FORMULAIRE */}
-          <div className="bg-black border border-gray-800 p-5 rounded-xl flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-gray-300">
+          <div className="bg-white border border-gray-200 p-5 rounded-xl flex flex-col gap-4">
+            <h2 className="text-lg font-semibold text-gray-700">
               Informations client
             </h2>
 
@@ -168,7 +167,7 @@ export default function PanierPage() {
               placeholder="Nom complet"
               value={nom}
               onChange={(e) => setNom(e.target.value)}
-              className="bg-[#0f0f0f] border border-gray-700 px-4 py-2 rounded-lg focus:border-yellow-500 outline-none"
+              className="bg-white border border-gray-300 px-4 py-2 rounded-lg focus:border-[#212E53] outline-none"
             />
 
             <input
@@ -176,7 +175,7 @@ export default function PanierPage() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-[#0f0f0f] border border-gray-700 px-4 py-2 rounded-lg focus:border-yellow-500 outline-none"
+              className="bg-white border border-gray-300 px-4 py-2 rounded-lg focus:border-[#212E53] outline-none"
             />
 
             <input
@@ -184,15 +183,15 @@ export default function PanierPage() {
               placeholder="Téléphone"
               value={telephone}
               onChange={(e) => setTelephone(e.target.value)}
-              className="bg-[#0f0f0f] border border-gray-700 px-4 py-2 rounded-lg focus:border-yellow-500 outline-none"
+              className="bg-white border border-gray-300 px-4 py-2 rounded-lg focus:border-[#212E53] outline-none"
             />
           </div>
 
           {/* TOTAL */}
           <div className="flex flex-col justify-between">
-            <div className="bg-black border border-gray-800 p-5 rounded-xl text-right">
-              <p className="text-gray-400 text-sm">Total à payer</p>
-              <p className="text-3xl font-bold text-yellow-500">
+            <div className="bg-white border border-gray-200 p-5 rounded-xl text-right">
+              <p className="text-gray-500 text-sm">Total à payer</p>
+              <p className="text-3xl font-bold text-[#212E53]">
                 {total} DA
               </p>
             </div>
@@ -202,8 +201,8 @@ export default function PanierPage() {
               disabled={!nom || !email || !telephone}
               className={`mt-6 w-full py-3 rounded-xl font-semibold text-lg transition ${
                 !nom || !email || !telephone
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-yellow-500 text-black hover:bg-yellow-400"
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-[#212E53] text-white hover:bg-[#1a2542]"
               }`}
             >
               Passer la commande
@@ -214,8 +213,7 @@ export default function PanierPage() {
       </div>
     </main>
   );
-}  
-
+} 
 
 
 
