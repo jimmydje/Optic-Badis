@@ -13,7 +13,7 @@ interface Product {
   createdAt: string;
 }
 
-export default function SolaireHommePage() {
+export default function SolaireFemmePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -25,19 +25,12 @@ export default function SolaireHommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=solaire.homme");
+        const res = await fetch("/api/produits?categorie=solaire/femmes");
+
+        if (!res.ok) throw new Error("Erreur API");
+
         const data = await res.json();
-
-        if (!res.ok) {
-          console.error("Erreur API :", data);
-          return;
-        }
-
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          setProducts([]);
-        }
+        setProducts(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -47,11 +40,6 @@ export default function SolaireHommePage() {
 
     fetchProducts();
   }, []);
-
-  // reset page si filtre change
-  useEffect(() => {
-    setPage(1);
-  }, [sort, marqueFilter]);
 
   const addToCart = (product: Product) => {
     const existing = localStorage.getItem("cart");
@@ -110,7 +98,7 @@ export default function SolaireHommePage() {
 
       {/* TITLE */}
       <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
-        Lunettes Solaires Homme
+        Lunettes Solaires Femme
       </h1>
 
       {/* FILTRES */}
@@ -174,7 +162,7 @@ export default function SolaireHommePage() {
 
                 {/* IMAGE */}
                 <div className="relative">
-                  <Link href={`/solaire/homme/${product.id}`}>
+                  <Link href={`/solaire/femmes/${product.id}`}>
                     <img
                       src={imageSrc}
                       alt={product.nom}
@@ -190,11 +178,11 @@ export default function SolaireHommePage() {
 
                 {/* INFOS */}
                 <div className="p-6">
-                  <Link href={`/solaire/homme/${product.id}`}>
+                  <Link href={`/solaire/femmes/${product.id}`}>
                     <h3 className="text-lg font-medium hover:underline">
                       {product.nom}
                     </h3>
-                  </Link>
+                  </Link>   
 
                   {product.marque && (
                     <p className="text-sm text-neutral-500 mt-1">
@@ -241,4 +229,4 @@ export default function SolaireHommePage() {
 
     </main>
   );
-}  
+}    

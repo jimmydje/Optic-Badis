@@ -13,6 +13,8 @@ model Client {
   nom       String
   email     String     @unique
   telephone String?
+  adresse   String?   // ✅ ajouté
+  ville     String?   // ✅ ajouté
   createdAt DateTime   @default(now())
   commandes Commande[] @relation("ClientCommandes")
 }
@@ -50,9 +52,11 @@ model Commande {
   clientId  String
   telephone String?
   adresse   String?
+  ville     String?   // ✅ ajouté
+
   client    Client         @relation("ClientCommandes", fields: [clientId], references: [id], onDelete: Cascade)
   items     CommandeItem[] @relation("CommandeItems")
-}
+}  
 
 model CommandeItem {
   id         String   @id @default(cuid())

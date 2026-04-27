@@ -8,8 +8,8 @@ const CATEGORIES_AUTORISEES = [
   "Femme",
   "Enfant",
   "Lentilles",
-  "solaire.homme",
-  "solaire.femme",
+  "solaire/hommes",
+  "solaire/femmes",   
 ];
 
 // =========================================

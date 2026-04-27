@@ -1,23 +1,25 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// 🔹 GET
+// =========================================
+// 🔹 GET → Récupérer UN produit
+// =========================================
 export async function GET(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ✅ IMPORTANT FIX
-
-  if (!id) {
-    return NextResponse.json(
-      { error: "ID manquant" },
-      { status: 400 }
-    );
-  }
-
   try {
+    const { id } = await context.params;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID manquant" },
+        { status: 400 }
+      );
+    }
+
     const produit = await prisma.produit.findUnique({
-      where: { id }, // ✅ PLUS undefined
+      where: { id },
     });
 
     if (!produit) {
@@ -28,7 +30,10 @@ export async function GET(
     }
 
     return NextResponse.json(produit);
+
   } catch (error) {
+    console.error("🔥 GET PRODUIT ERROR:", error);
+
     return NextResponse.json(
       { error: "Erreur serveur" },
       { status: 500 }
@@ -36,37 +41,42 @@ export async function GET(
   }
 }
 
-// 🔹 PUT
+// =========================================
+// 🔹 PUT → Modifier produit
+// =========================================
 export async function PUT(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ✅ FIX IMPORTANT
-
-  if (!id) {
-    return NextResponse.json(
-      { error: "ID manquant" },
-      { status: 400 }
-    );
-  }
-
-  const body = await req.json();
-
   try {
+    const { id } = await context.params;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID manquant" },
+        { status: 400 }
+      );
+    }
+
+    const body = await req.json();
+
     const updated = await prisma.produit.update({
-      where: { id }, // ✅ FIX
+      where: { id },
       data: {
         nom: body.nom,
         description: body.description ?? null,
         prix: Number(body.prix),
         categorie: body.categorie,
-        stock: Number(body.stock),
-        images: body.images,
+        stock: Number(body.stock ?? 0),
+        images: body.images ?? [],
       },
     });
 
     return NextResponse.json(updated);
+
   } catch (error) {
+    console.error("🔥 UPDATE PRODUIT ERROR:", error);
+
     return NextResponse.json(
       { error: "Erreur update produit" },
       { status: 500 }
@@ -74,22 +84,36 @@ export async function PUT(
   }
 }
 
-// 🔹 DELETE
+// =========================================
+// 🔹 DELETE → Supprimer produit
+// =========================================
 export async function DELETE(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ✅ FIX
-
   try {
+    const { id } = await context.params;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID manquant" },
+        { status: 400 }
+      );
+    }
+
     await prisma.produit.delete({
       where: { id },
     });
 
-    return NextResponse.json({ message: "Produit supprimé" });
+    return NextResponse.json({
+      message: "Produit supprimé avec succès",
+    });
+
   } catch (error) {
+    console.error("🔥 DELETE PRODUIT ERROR:", error);
+
     return NextResponse.json(
-      { error: "Erreur suppression" },
+      { error: "Erreur suppression produit" },
       { status: 500 }
     );
   }

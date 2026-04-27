@@ -11,14 +11,16 @@ import {
   User
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
-import { authClient } from "@/lib/auth/client";  
+import { authClient } from "@/lib/auth/client";
 
 export default function Navbar() {
   const { data: session } = authClient.useSession();
 
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+  const [openMenu, setOpenMenu] = useState<string | null>(null); // desktop
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<string | null>(null); // mobile
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -38,6 +40,7 @@ export default function Navbar() {
     setMobileOpen(false);
   };
 
+  // Desktop hover menu
   const handleMouseEnter = (menu: string) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setOpenMenu(menu);
@@ -46,92 +49,79 @@ export default function Navbar() {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setOpenMenu(null);
-    }, 800);
+    }, 250);
+  };
+
+  // Mobile accordion
+  const toggleMobileMenu = (menu: string) => {
+    setMobileMenuOpen(mobileMenuOpen === menu ? null : menu);
   };
 
   const linkClass = (path: string) =>
-    `text-sm font-medium tracking-wide whitespace-nowrap ${
+    `text-sm font-medium ${
       pathname?.startsWith(path)
-        ? "text-black"
-        : "text-gray-600 hover:text-black"
+        ? "text-[#212E53]"
+        : "text-gray-600 hover:text-[#212E53]"
     }`;
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) setMobileOpen(false);
+    if (!mobileOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [mobileOpen]);
 
   return (
-    <nav className="bg-white text-black px-6 py-4 shadow-sm relative z-50">
-      <div className="max-w-7xl mx-auto grid grid-cols-3 items-center">
+    <nav className="bg-white text-black px-6 py-4 shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
 
-        {/* LEFT MENU */}
+        {/* LEFT DESKTOP */}
         <div className="hidden md:flex items-center gap-8">
 
           {/* SOLAIRE */}
           <div
-            className="relative"
             onMouseEnter={() => handleMouseEnter("solaire")}
             onMouseLeave={handleMouseLeave}
+            className="relative"
           >
-            <span className="text-sm font-medium text-gray-600 hover:text-black cursor-pointer whitespace-nowrap">
+            <span className="cursor-pointer text-sm text-gray-600 hover:text-[#212E53]">
               LUNETTES SOLAIRES
             </span>
 
             {openMenu === "solaire" && (
-              <div className="absolute left-0 top-full mt-2">
-                <div className="bg-[#212E53] text-white w-64 p-6 shadow-xl rounded-xl animate-fadeIn">
-                  <ul className="flex flex-col gap-4">
-                    <li>
-                      <Link href="/solaire.homme" className="hover:underline">
-                        HOMME
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/solaire.femme" className="hover:underline">
-                        FEMME
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+              <div className="absolute top-full mt-3 w-56 bg-white border shadow-lg rounded-xl p-4 animate-fadeIn">
+                <Link href="/solaire/hommes" className="block py-2 hover:text-[#212E53]">
+                  HOMME
+                </Link>
+                <Link href="/solaire/femmes" className="block py-2 hover:text-[#212E53]">
+                  FEMME
+                </Link>
               </div>
             )}
           </div>
 
           {/* OPTIQUE */}
           <div
-            className="relative"
             onMouseEnter={() => handleMouseEnter("optique")}
             onMouseLeave={handleMouseLeave}
+            className="relative"
           >
-            <span className="text-sm font-medium text-gray-600 hover:text-black cursor-pointer whitespace-nowrap">
+            <span className="cursor-pointer text-sm text-gray-600 hover:text-[#212E53]">
               LUNETTES OPTIQUES
             </span>
 
             {openMenu === "optique" && (
-              <div className="absolute left-0 top-full mt-2">
-                <div className="bg-[#212E53] text-white w-64 p-6 shadow-xl rounded-xl animate-fadeIn">
-                  <ul className="flex flex-col gap-4">
-                    <li>
-                      <Link href="/homme" className="hover:underline">
-                        HOMME
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/femme" className="hover:underline">
-                        FEMME
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/enfants" className="hover:underline">
-                        ENFANTS
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+              <div className="absolute top-full mt-3 w-56 bg-white border shadow-lg rounded-xl p-4 animate-fadeIn">
+                <Link href="/homme" className="block py-2 hover:text-[#212E53]">
+                  HOMME
+                </Link>
+                <Link href="/femme" className="block py-2 hover:text-[#212E53]">
+                  FEMME
+                </Link>
+                <Link href="/enfants" className="block py-2 hover:text-[#212E53]">
+                  ENFANTS
+                </Link>
               </div>
             )}
           </div>
@@ -142,24 +132,20 @@ export default function Navbar() {
         </div>
 
         {/* LOGO */}
-        <div className="flex justify-center">
-          <Link href="/">
-            <h1 className="text-xl font-semibold tracking-widest">
-              OPTIC BADIS
-            </h1>
-          </Link>
-        </div>
+        <Link href="/" className="text-lg font-semibold tracking-widest">
+          OPTIC BADIS
+        </Link>
 
-        {/* RIGHT */}
-        <div className="hidden md:flex items-center justify-end gap-6">
+        {/* RIGHT DESKTOP */}
+        <div className="hidden md:flex items-center gap-6">
 
-          <form onSubmit={handleSearch} className="flex items-center gap-2">
+          <form onSubmit={handleSearch} className="flex items-center gap-2 border-b">
             <input
               type="text"
               placeholder="Recherche"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border-b border-gray-300 outline-none text-sm px-2 py-1 focus:border-[#212E53]"
+              className="outline-none text-sm px-2 py-1"
             />
             <button type="submit">
               <Search size={18} />
@@ -171,7 +157,7 @@ export default function Navbar() {
               <span className="text-sm">{session.user.name}</span>
 
               {session.user.role?.toLowerCase() === "admin" && (
-                <Link href="/admin" className="text-sm font-semibold">
+                <Link href="/admin" className="text-sm font-semibold text-[#212E53]">
                   Admin
                 </Link>
               )}
@@ -192,20 +178,77 @@ export default function Navbar() {
         </div>
 
         {/* MOBILE BUTTON */}
-        <div className="flex justify-end md:hidden">
-          <button onClick={() => setMobileOpen(!mobileOpen)}>
-            {mobileOpen ? <X size={26} /> : <Menu size={26} />}
-          </button>
-        </div>
+        <button className="md:hidden" onClick={() => setMobileOpen(true)}>
+          <Menu size={26} />
+        </button>
       </div>
 
       {/* MOBILE MENU */}
-      {mobileOpen && (
-        <div className="md:hidden mt-4 flex flex-col gap-4 bg-white p-4 shadow-lg">
-          <Link href="/lunettes-de-soleil">LUNETTES SOLAIRES</Link>
-          <Link href="/lunettes-de-vue">LUNETTES OPTIQUES</Link>
-          <Link href="/lentilles">LENTILLES</Link>
+      <div
+        className={`fixed top-0 right-0 h-full w-[75%] bg-white shadow-lg z-50 transition-transform duration-300 ${
+          mobileOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-6 flex flex-col gap-6">
 
+          {/* HEADER */}
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold">Menu</h2>
+            <button onClick={() => setMobileOpen(false)}>
+              <X />
+            </button>
+          </div>
+
+          {/* SOLAIRE MOBILE */}
+          <div>
+            <button
+              onClick={() => toggleMobileMenu("solaire")}
+              className="w-full text-left font-medium"
+            >
+              LUNETTES SOLAIRES
+            </button>
+
+            {mobileMenuOpen === "solaire" && (
+              <div className="pl-4 mt-2 flex flex-col gap-2 text-sm text-gray-600">
+                <Link href="/solaire/hommes" onClick={() => setMobileOpen(false)}>
+                  HOMME
+                </Link>
+                <Link href="/solaire/femmes" onClick={() => setMobileOpen(false)}>
+                  FEMME
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* OPTIQUE MOBILE */}
+          <div>
+            <button
+              onClick={() => toggleMobileMenu("optique")}
+              className="w-full text-left font-medium"
+            >
+              LUNETTES OPTIQUES
+            </button>
+
+            {mobileMenuOpen === "optique" && (
+              <div className="pl-4 mt-2 flex flex-col gap-2 text-sm text-gray-600">
+                <Link href="/homme" onClick={() => setMobileOpen(false)}>
+                  HOMME
+                </Link>
+                <Link href="/femme" onClick={() => setMobileOpen(false)}>
+                  FEMME
+                </Link>
+                <Link href="/enfants" onClick={() => setMobileOpen(false)}>
+                  ENFANTS
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <Link href="/lentilles" onClick={() => setMobileOpen(false)}>
+            LENTILLES
+          </Link>
+
+          {/* SEARCH */}
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
               type="text"
@@ -219,7 +262,9 @@ export default function Navbar() {
             </button>
           </form>
 
-          <Link href="/panier">Panier</Link>
+          <Link href="/panier" onClick={() => setMobileOpen(false)}>
+            Panier
+          </Link>
 
           {session?.user ? (
             <button onClick={handleLogout}>Logout</button>
@@ -227,6 +272,14 @@ export default function Navbar() {
             <Link href="/auth/sign-in">Sign in</Link>
           )}
         </div>
+      </div>
+
+      {/* BACKDROP */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
 
       {/* ANIMATION */}
@@ -248,10 +301,6 @@ export default function Navbar() {
     </nav>
   );
 }  
-   
-
-
-
 
 
 

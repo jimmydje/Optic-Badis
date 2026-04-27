@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 
 interface Product {
   id: string;
   imageUrl?: string;
+  images?: string[];
   nom: string;
   marque?: string;
   prix: number;
@@ -25,7 +26,7 @@ export default function FemmePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Femme");
+        const res = await fetch("/api/produits?categorie=Femme");   
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
         setProducts(data);
@@ -33,75 +34,95 @@ export default function FemmePage() {
         console.error(err);
       } finally {
         setLoading(false);
-      }
+      }  
     };
     fetchProducts();
   }, []);
 
-  const addToCart = (product: Product) => {
-    const existing = localStorage.getItem("cart");
-    let cart = existing ? JSON.parse(existing) : [];
+  useEffect(() => {
+    setPage(1);
+  }, [sort, marqueFilter]);
 
-    const existingItem = cart.find((item: any) => item.id === product.id);
-    if (existingItem) {
-      existingItem.quantite += 1;
-    } else {
-      cart.push({
-        id: product.id,
-        nom: product.nom,
-        prix: product.prix,
-        quantite: 1,
-      });
+  const filtered = useMemo(() => {
+    let data = [...products];
+
+    if (marqueFilter) {
+      data = data.filter((p) => p.marque === marqueFilter);
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`✅ ${product.nom} ajouté au panier`);
+    if (sort === "price-asc") {
+      data.sort((a, b) => a.prix - b.prix);
+    }
+
+    if (sort === "price-desc") {
+      data.sort((a, b) => b.prix - a.prix);
+    }
+
+    if (sort === "date-new") {
+      data.sort(
+        (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+      );
+    }
+
+    return data;
+  }, [products, sort, marqueFilter]);
+
+  // ✅ FIX UNIQUEMENT ICI (panier fonctionnel)
+  const addToCart = (product: Product) => {
+    try {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      const image =
+        product.imageUrl ||
+        product.images?.[0] ||
+        "/images/default.jpg";
+
+      const index = cart.findIndex((item: any) => item.id === product.id);
+
+      if (index !== -1) {
+        cart[index].quantite += 1;
+      } else {
+        cart.push({
+          id: product.id,
+          nom: product.nom,
+          prix: product.prix,
+          image,
+          quantite: 1,
+        });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+
+      // 🔥 sync live panier
+      window.dispatchEvent(new Event("cartUpdated"));
+
+      console.log("✅ Ajouté au panier :", product.nom);
+    } catch (error) {
+      console.error("Erreur panier :", error);
+    }
   };
 
-  // 🔽 FILTRAGE + TRI
-  let filtered = [...products];
-
-  if (marqueFilter) {
-    filtered = filtered.filter((p) => p.marque === marqueFilter);
-  }
-
-  if (sort === "price-asc") {
-    filtered.sort((a, b) => a.prix - b.prix);
-  }
-
-  if (sort === "price-desc") {
-    filtered.sort((a, b) => b.prix - a.prix);
-  }
-
-  if (sort === "date-new") {
-    filtered.sort(
-      (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
-    );
-  }
-
-  // 🔽 PAGINATION
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
+
   const marques = Array.from(
     new Set(products.map((p) => p.marque).filter(Boolean))
   );
+
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
     <main className="min-h-screen bg-neutral-100 text-black px-6 py-20">
-
-      {/* TITLE */}
       <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
         Collection Femme
       </h1>
 
       {/* FILTRES */}
       <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row gap-4 justify-between">
-        
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="bg-white border border-neutral-300 rounded-xl px-4 py-3 text-black focus:outline-none"
+          className="bg-white border border-neutral-300 rounded-xl px-4 py-3"
         >
           <option value="">Trier par</option>
           <option value="price-asc">Prix croissant</option>
@@ -112,7 +133,7 @@ export default function FemmePage() {
         <select
           value={marqueFilter}
           onChange={(e) => setMarqueFilter(e.target.value)}
-          className="bg-white border border-neutral-300 rounded-xl px-4 py-3 text-black focus:outline-none"
+          className="bg-white border border-neutral-300 rounded-xl px-4 py-3"
         >
           <option value="">Toutes les marques</option>
           {marques.map((m) => (
@@ -127,7 +148,7 @@ export default function FemmePage() {
             setSort("");
             setMarqueFilter("");
           }}
-          className="px-6 py-3 rounded-xl bg-[#212E53] text-white hover:opacity-90 transition"
+          className="px-6 py-3 rounded-xl bg-[#212E53] text-white"
         >
           Réinitialiser
         </button>
@@ -143,31 +164,30 @@ export default function FemmePage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {visibleProducts.map((product) => {
-            const imageSrc = product.imageUrl || "/images/default.jpg";
+            const imageSrc =
+              product.imageUrl ||
+              product.images?.[0] ||
+              "/images/default.jpg";
 
             return (
               <div
                 key={product.id}
-                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer"
+                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition"
               >
-                
-                {/* IMAGE */}
                 <div className="relative">
                   <Link href={`/femme/${product.id}`}>
                     <img
                       src={imageSrc}
                       alt={product.nom}
-                      className="h-64 w-full object-cover group-hover:scale-105 transition duration-300"
+                      className="h-64 w-full object-cover group-hover:scale-105 transition"
                     />
                   </Link>
 
-                  {/* BADGE */}
                   <span className="absolute top-3 left-3 bg-[#212E53] text-white text-xs px-3 py-1 rounded-full">
                     Nouveau
                   </span>
                 </div>
 
-                {/* INFOS */}
                 <div className="p-6">
                   <Link href={`/femme/${product.id}`}>
                     <h3 className="text-lg font-medium hover:underline">
@@ -185,9 +205,10 @@ export default function FemmePage() {
                     {product.prix} DA
                   </p>
 
+                  {/* ✅ BOUTON FIXÉ */}
                   <button
                     onClick={() => addToCart(product)}
-                    className="w-full mt-6 py-3 rounded-full bg-[#212E53] text-white hover:opacity-90 transition"
+                    className="w-full mt-6 py-3 rounded-full bg-[#212E53] text-white"
                   >
                     Ajouter au panier
                   </button>
@@ -200,23 +221,20 @@ export default function FemmePage() {
 
       {/* PAGINATION */}
       <div className="flex justify-center mt-16 gap-2">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-          (num) => (
-            <button
-              key={num}
-              onClick={() => setPage(num)}
-              className={`px-4 py-2 rounded-full ${
-                page === num
-                  ? "bg-[#212E53] text-white"
-                  : "bg-white border border-neutral-300 text-neutral-600 hover:bg-neutral-200"
-              } transition`}
-            >
-              {num}
-            </button>
-          )
-        )}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+          <button
+            key={num}
+            onClick={() => setPage(num)}
+            className={`px-4 py-2 rounded-full ${
+              page === num
+                ? "bg-[#212E53] text-white"
+                : "bg-white border text-neutral-600"
+            }`}
+          >
+            {num}
+          </button>
+        ))}
       </div>
-
     </main>
   );
 }  

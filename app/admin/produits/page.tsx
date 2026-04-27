@@ -109,6 +109,8 @@ export default function ProduitsPage() {
           <option value="Femme">Femme</option>
           <option value="Enfant">Enfant</option>
           <option value="Lentilles">Lentilles</option>
+          <option value="solaire/hommes">Solaire Hommes</option>
+          <option value="solaire/femmes">Solaire Femmes</option> 
         </select>
       </div>
 

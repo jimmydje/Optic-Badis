@@ -25,10 +25,10 @@ export default function HommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Homme");
-        if (!res.ok) throw new Error("Erreur API");
+        const res = await fetch("/api/produits?categorie=Homme");  
+        if (!res.ok) throw new Error("Erreur API"); 
         const data = await res.json();
-        setProducts(data);
+        setProducts(data);  
       } catch (err) {
         console.error(err);
       } finally {
@@ -175,7 +175,7 @@ export default function HommePage() {
                   <Link href={`/homme/${product.id}`}>
                     <h3 className="text-lg font-medium hover:underline">
                       {product.nom}
-                    </h3>
+                    </h3>   
                   </Link>
 
                   {product.marque && (

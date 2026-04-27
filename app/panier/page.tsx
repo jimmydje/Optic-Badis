@@ -10,18 +10,16 @@ export default function PanierPage() {
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [ville, setVille] = useState("");
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Charger panier
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
-    }
+    if (savedCart) setCart(JSON.parse(savedCart));
   }, []);
 
-  // Charger utilisateur connecté
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -33,11 +31,12 @@ export default function PanierPage() {
           setNom(data.user.nom || "");
           setEmail(data.user.email || "");
           setTelephone(data.user.telephone || "");
+          setAdresse(data.user.adresse || "");
+          setVille(data.user.ville || "");
         } else {
           router.push("/auth/sign-in");
         }
-      } catch (err) {
-        console.error(err);
+      } catch {
         router.push("/login");
       } finally {
         setLoading(false);
@@ -48,9 +47,9 @@ export default function PanierPage() {
   }, [router]);
 
   const removeFromCart = (id: string) => {
-    const updatedCart = cart.filter((item) => item.id !== id);
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const updated = cart.filter((i) => i.id !== id);
+    setCart(updated);
+    localStorage.setItem("cart", JSON.stringify(updated));
   };
 
   const total = cart.reduce(
@@ -59,54 +58,39 @@ export default function PanierPage() {
   );
 
   const passerCommande = async () => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
+    if (!nom || !email || !telephone || !adresse || !ville) return;
 
-    if (!nom || !email || !telephone) {
-      alert("Veuillez remplir toutes vos coordonnées !");
-      return;
-    }
+    await fetch("/api/commandes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        client: { nom, email, telephone, adresse, ville },
+        total,
+        items: cart.map((i) => ({
+          produitId: i.id,
+          quantite: i.quantite,
+        })),
+      }),
+    });
 
-    try {
-      const res = await fetch("/api/commandes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          client: { nom, email, telephone },
-          total,
-          items: cart.map((item) => ({
-            produitId: item.id,
-            quantite: item.quantite,
-          })),
-        }),
-      });
-
-      if (res.ok) {
-        alert("✅ Commande enregistrée !");
-        setCart([]);
-        localStorage.removeItem("cart");
-      } else {
-        alert("Erreur lors de la commande");
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    setCart([]);
+    localStorage.removeItem("cart");
+    alert("Commande envoyée !");
   };
 
   if (loading) return null;
 
-  // Panier vide
   if (cart.length === 0) {
     return (
-      <main className="flex flex-col items-center justify-center min-h-[80vh] bg-white text-black">
-        <h1 className="text-3xl font-bold mb-4">🛒 Votre panier</h1>
+      <main className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4">
+          🛒 Votre panier
+        </h1>
         <p className="text-gray-500">Votre panier est vide.</p>
 
         <a
           href="/"
-          className="mt-6 bg-[#212E53] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#1a2542] transition"
+          className="mt-6 bg-[#212E53] text-white px-6 py-2 rounded-full"
         >
           Continuer vos achats
         </a>
@@ -115,95 +99,104 @@ export default function PanierPage() {
   }
 
   return (
-    <main className="p-6 md:p-10 bg-white min-h-screen text-black">
-      <h1 className="text-3xl font-bold mb-8 text-center">
+    <main className="px-4 md:px-10 py-8 bg-white min-h-screen text-black">
+      <h1 className="text-2xl md:text-3xl font-bold text-center mb-8">
         🛍️ Votre panier
       </h1>
 
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 border">
 
-        {/* TABLEAU */}
-        <table className="w-full text-left mb-8">
-          <thead>
-            <tr className="border-b border-gray-300 text-gray-600">
-              <th className="py-2">Produit</th>
-              <th className="py-2">Prix</th>
-              <th className="py-2">Quantité</th>
-              <th className="py-2 text-right">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {cart.map((item) => (
-              <tr key={item.id} className="border-b border-gray-200">
-                <td className="py-3 font-medium">{item.nom}</td>
-                <td className="py-3">{item.prix} DA</td>
-                <td className="py-3">{item.quantite}</td>
-
-                <td className="py-3 text-right">
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="text-red-500 hover:text-red-700 transition"
-                  >
-                    Supprimer
-                  </button>
-                </td>
+        {/* ================= TABLE DESKTOP ================= */}
+        <div className="hidden md:block">
+          <table className="w-full text-left mb-8">
+            <thead>
+              <tr className="border-b text-gray-600">
+                <th>Produit</th>
+                <th>Prix</th>
+                <th>Quantité</th>
+                <th className="text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
 
-        {/* FORM + TOTAL */}
-        <div className="grid md:grid-cols-2 gap-10">
+            <tbody>
+              {cart.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="py-3">{item.nom}</td>
+                  <td>{item.prix} DA</td>
+                  <td>{item.quantite}</td>
+                  <td className="text-right">
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-red-500"
+                    >
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-          {/* FORMULAIRE */}
-          <div className="bg-white border border-gray-200 p-5 rounded-xl flex flex-col gap-4">
-            <h2 className="text-lg font-semibold text-gray-700">
-              Informations client
-            </h2>
+        {/* ================= MOBILE CARDS ================= */}
+        <div className="md:hidden space-y-4 mb-6">
+          {cart.map((item) => (
+            <div
+              key={item.id}
+              className="border rounded-lg p-4 shadow-sm"
+            >
+              <h3 className="font-semibold">{item.nom}</h3>
+              <p className="text-sm text-gray-600">
+                Prix: {item.prix} DA
+              </p>
+              <p className="text-sm">Quantité: {item.quantite}</p>
 
-            <input
-              type="text"
-              placeholder="Nom complet"
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
-              className="bg-white border border-gray-300 px-4 py-2 rounded-lg focus:border-[#212E53] outline-none"
-            />
+              <button
+                onClick={() => removeFromCart(item.id)}
+                className="mt-2 text-red-500 text-sm"
+              >
+                Supprimer
+              </button>
+            </div>
+          ))}
+        </div>
 
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-white border border-gray-300 px-4 py-2 rounded-lg focus:border-[#212E53] outline-none"
-            />
+        {/* ================= FORM + TOTAL ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <input
-              type="tel"
-              placeholder="Téléphone"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-              className="bg-white border border-gray-300 px-4 py-2 rounded-lg focus:border-[#212E53] outline-none"
-            />
+          {/* FORM */}
+          <div className="space-y-3">
+            <h2 className="font-semibold">Informations client</h2>
+
+            <input className="input" placeholder="Nom"
+              value={nom} onChange={(e) => setNom(e.target.value)} />
+
+            <input className="input" placeholder="Email"
+              value={email} onChange={(e) => setEmail(e.target.value)} />
+
+            <input className="input" placeholder="Téléphone"
+              value={telephone} onChange={(e) => setTelephone(e.target.value)} />
+
+            <input className="input" placeholder="Adresse"
+              value={adresse} onChange={(e) => setAdresse(e.target.value)} />
+
+            <input className="input" placeholder="Ville"
+              value={ville} onChange={(e) => setVille(e.target.value)} />
           </div>
 
           {/* TOTAL */}
           <div className="flex flex-col justify-between">
-            <div className="bg-white border border-gray-200 p-5 rounded-xl text-right">
-              <p className="text-gray-500 text-sm">Total à payer</p>
-              <p className="text-3xl font-bold text-[#212E53]">
+            <div className="border p-4 rounded-xl text-right">
+              <p className="text-gray-500">Total</p>
+              <p className="text-2xl font-bold text-[#212E53]">
                 {total} DA
               </p>
             </div>
 
             <button
               onClick={passerCommande}
-              disabled={!nom || !email || !telephone}
-              className={`mt-6 w-full py-3 rounded-xl font-semibold text-lg transition ${
-                !nom || !email || !telephone
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-[#212E53] text-white hover:bg-[#1a2542]"
-              }`}
+              disabled={!nom || !email || !telephone || !adresse || !ville}
+              className="mt-4 w-full bg-[#212E53] text-white py-3 rounded-xl disabled:bg-gray-300"
             >
               Passer la commande
             </button>
@@ -211,13 +204,20 @@ export default function PanierPage() {
 
         </div>
       </div>
+
+      {/* input style */}
+      <style jsx>{`
+        .input {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          outline: none;
+        }
+      `}</style>
     </main>
   );
-} 
-
-
-
-
+}  
 
 
 

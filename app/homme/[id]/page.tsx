@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { Star } from "lucide-react";
 
 interface Product {
   id: string;
@@ -11,19 +10,17 @@ interface Product {
   description?: string;
   images: string[];
   prix?: number;
-  marque?: string;
-  categorie?: string;
-  createdAt?: string;
 }
 
 export default function ProduitDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
+
+  // ✅ FIX IMPORTANT
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [mainImageIndex, setMainImageIndex] = useState(0);
-
-  // ✅ toast warning
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,13 +28,19 @@ export default function ProduitDetailPage() {
 
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/produits/${id}`);
-        if (!res.ok) throw new Error("Produit introuvable");
+        setLoading(true);
 
+        const res = await fetch(`/api/produits/${id}`);
         const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.error || "Produit introuvable");
+        }
+
         setProduct(data);
       } catch (error) {
-        console.error("Erreur chargement produit :", error);
+        console.error("Erreur produit :", error);
+        setProduct(null);
       } finally {
         setLoading(false);
       }
@@ -46,7 +49,6 @@ export default function ProduitDetailPage() {
     fetchProduct();
   }, [id]);
 
-  // ✅ ADD TO CART + WARNING
   function addToCart(product: Product) {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
@@ -62,130 +64,90 @@ export default function ProduitDetailPage() {
 
     localStorage.setItem("cart", JSON.stringify(cart));
 
-    // 🔔 WARNING
     setToast("Produit ajouté au panier ✔");
-
-    setTimeout(() => {
-      setToast(null);
-    }, 2000);
+    setTimeout(() => setToast(null), 2000);
   }
 
-  if (loading)
-    return <p className="p-6 text-center text-white">Chargement...</p>;
-
-  if (!product)
-    return <p className="p-6 text-center text-white">Produit introuvable.</p>;
+  if (loading) return <p className="text-center p-10">Chargement...</p>;
+  if (!product) return <p className="text-center p-10">Produit introuvable</p>;
 
   const images = product.images || [];
 
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-10 text-white">
+    <div className="min-h-screen bg-white text-black">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2">
 
-      {/* ---- IMAGE ---- */}
-      <div className="flex flex-col items-center justify-center gap-4">
-        {images.length > 0 ? (
-          <div className="relative w-full h-[420px]">
-            <Image
-              src={images[mainImageIndex]}
-              alt={product.nom}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-contain drop-shadow-xl"
-            />
-          </div>
-        ) : (
-          <div className="w-full h-[420px] flex items-center justify-center">
-            No image available
-          </div>
-        )}
+        {/* IMAGE */}
+        <div className="flex flex-col items-center justify-center p-10">
 
-        {/* Miniatures */}
-        <div className="flex gap-2 mt-4">
-          {images.map((img, idx) => (
-            <div
-              key={idx}
-              onClick={() => setMainImageIndex(idx)}
-              className={`w-16 h-16 border rounded cursor-pointer overflow-hidden ${
-                idx === mainImageIndex
-                  ? "border-yellow-500"
-                  : "border-neutral-700"
-              }`}
-            >
-              <Image
-                src={img}
-                alt={`${product.nom} ${idx + 1}`}
-                width={64}
-                height={64}
-                className="object-cover"
-              />
-            </div>
-          ))}
+          {images.length > 0 ? (
+            <>
+              <div className="relative w-full h-[400px] rounded-2xl overflow-hidden bg-gray-50">
+                <Image
+                  src={images[mainImageIndex]}
+                  alt={product.nom}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                {images.map((img, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setMainImageIndex(idx)}
+                    className={`w-16 h-16 rounded-lg overflow-hidden border cursor-pointer ${
+                      idx === mainImageIndex
+                        ? "border-black"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={product.nom}
+                      width={64}
+                      height={64}
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p>No image</p>
+          )}
+        </div>
+
+        {/* INFOS */}
+        <div className="bg-[#212E53] text-white p-10 flex flex-col justify-center space-y-6">
+
+          <h1 className="text-3xl font-bold">{product.nom}</h1>
+
+          <p className="text-2xl font-semibold">
+            DA {product.prix ?? 0}
+          </p>
+
+          <div className="bg-white/20 py-3 text-center rounded">
+            Disponible
+          </div>
+
+          <hr className="border-white/30" />
+
+          <p className="text-sm text-white/80">
+            {product.description || "Aucune description disponible."}
+          </p>
+
+          <button
+            onClick={() => addToCart(product)}
+            className="mt-6 bg-white text-[#212E53] py-3 font-semibold rounded-lg"
+          >
+            Ajouter au panier
+          </button>
         </div>
       </div>
 
-      {/* ---- INFOS ---- */}
-      <div className="space-y-5">
-
-        <h1 className="text-4xl font-bold">{product.nom}</h1>
-
-        {/* ⭐⭐⭐⭐⭐ */}
-        <div className="flex items-center gap-2 text-yellow-500">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={20} fill="#facc15" stroke="#facc15" />
-          ))}
-          <span className="text-white">(464 Clients Satisfaits)</span>
-        </div>
-
-        {/* PRIX */}
-        <div className="flex items-center gap-4">
-          <p className="text-3xl font-bold">
-            {product.prix ?? 0} DA
-          </p>
-
-          <p className="text-xl line-through text-gray-300">
-            DA 4,900.00
-          </p>
-
-          <span className="bg-[#DAAB3A] text-white text-sm px-3 py-1 rounded-full">
-            SAVE - DA 500
-          </span>
-        </div>
-
-        {/* WARNING badge */}
-        <div className="bg-red-100 text-red-600 border border-red-300 px-4 py-2 rounded-lg w-fit font-medium">
-          ⚠️ Attention : édition limitée
-        </div>
-
-        {/* LISTE */}
-        <ul className="list-disc pl-5 space-y-1">
-          <li>Design confortable et léger</li>
-          <li>Matériaux premium</li>
-          <li>Protection UV</li>
-          <li>Livraison 24–72h</li>
-          <li>Paiement à la livraison</li>
-          <li>SAV réactif</li>
-        </ul>
-
-        {/* BOUTON */}
-        <button
-          onClick={() => addToCart(product)}
-          className="w-full mt-6 py-3 rounded-full bg-white text-black hover:bg-neutral-200 transition"
-        >
-          Ajouter au panier
-        </button>
-
-        {/* DESCRIPTION */}
-        {product.description && (
-          <div className="pt-4">
-            <h2 className="text-xl font-semibold mb-2">Description</h2>
-            <p>{product.description}</p>
-          </div>
-        )}
-      </div>
-
-      {/* 🔔 TOAST WARNING */}
       {toast && (
-        <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg animate-pulse">
+        <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg">
           {toast}
         </div>
       )}

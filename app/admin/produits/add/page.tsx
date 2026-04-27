@@ -134,10 +134,10 @@ export default function AjouterProduitPage() {
             <option value="Femme" className="text-black">Femme</option>
             <option value="Enfant" className="text-black">Enfant</option>
             <option value="Lentilles" className="text-black">Lentilles</option>
-            <option value="solaire.homme" className="text-black">Solaire Homme</option>
-            <option value="solaire.femme" className="text-black">Solaire Femme</option>
+            <option value="solaire/hommes" className="text-black">Solaire Homme</option>
+            <option value="solaire/femmes" className="text-black">Solaire Femme</option>
           </select>
-        </div>
+        </div>   
 
         {/* Stock */}
         <div>

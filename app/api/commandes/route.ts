@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// 🔹 transformation pour le front (items → produits)
+// 🔹 format response
 function formatCommande(cmd: any) {
   return {
     id: cmd.id,
@@ -10,14 +10,17 @@ function formatCommande(cmd: any) {
     total: cmd.total,
     statut: cmd.statut,
     date: cmd.date,
+    adresse: cmd.adresse,
+    ville: cmd.ville,
 
-    produits: cmd.items?.map((item: any) => ({
-      id: item.produitId,
-      nom: item.nom,
-      prix: item.prix,
-      image: item.image,
-      quantite: item.quantite,
-    })) || [],
+    produits:
+      cmd.items?.map((item: any) => ({
+        id: item.produitId,
+        nom: item.nom,
+        prix: item.prix,
+        image: item.image,
+        quantite: item.quantite,
+      })) || [],
   };
 }
 
@@ -27,7 +30,7 @@ export async function GET() {
     const commandes = await prisma.commande.findMany({
       include: {
         client: true,
-        items: true, // ✅ snapshot déjà dedans
+        items: true,
       },
       orderBy: { date: "desc" },
     });
@@ -39,7 +42,7 @@ export async function GET() {
   }
 }
 
-// 🔹 POST
+// 🔹 POST (FIX COMPLET)
 export async function POST(req: Request) {
   try {
     const { client, items } = await req.json();
@@ -48,31 +51,39 @@ export async function POST(req: Request) {
       !client?.nom ||
       !client?.email ||
       !client?.telephone ||
+      !client?.adresse ||
+      !client?.ville ||
       !Array.isArray(items) ||
       items.length === 0
     ) {
       return NextResponse.json(
-        { error: "Client et items requis." },
+        { error: "Données invalides." },
         { status: 400 }
       );
     }
 
-    // ✅ UPSERT client
+    // 🔥 UPSERT CLIENT
     const clientCreated = await prisma.client.upsert({
       where: { email: client.email },
       update: {
         nom: client.nom,
         telephone: client.telephone,
+        adresse: client.adresse,
+        ville: client.ville,
       },
       create: {
         nom: client.nom,
         email: client.email,
         telephone: client.telephone,
+        adresse: client.adresse,
+        ville: client.ville,
       },
     });
 
-    // ✅ récupérer produits
-    const produitsIds = items.map((i: any) => i.produitId);
+    // 🔥 IDs sécurisés
+    const produitsIds = items
+      .map((i: any) => String(i.produitId))
+      .filter(Boolean);
 
     const produits = await prisma.produit.findMany({
       where: { id: { in: produitsIds } },
@@ -85,38 +96,48 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ calcul total sécurisé
+    // 🔥 TOTAL SAFE
     const total = items.reduce((sum: number, item: any) => {
-      const produit = produits.find((p) => p.id === item.produitId);
+      const produit = produits.find(
+        (p) => String(p.id) === String(item.produitId)
+      );
+
       if (!produit) return sum;
+
       return sum + produit.prix * (item.quantite || 1);
     }, 0);
 
-    // ✅ création commande avec snapshot
+    // 🔥 CREATION COMMANDE
     const newCommande = await prisma.commande.create({
       data: {
         clientId: clientCreated.id,
         total,
         statut: "En attente",
+        adresse: client.adresse,
+        ville: client.ville,
+        telephone: client.telephone,
 
         items: {
-          create: items.map((i: any) => {
-            const produit = produits.find((p) => p.id === i.produitId);
+          create: items
+            .filter((i: any) => {
+              const produit = produits.find(
+                (p) => String(p.id) === String(i.produitId)
+              );
+              return produit;
+            })
+            .map((i: any) => {
+              const produit = produits.find(
+                (p) => String(p.id) === String(i.produitId)
+              )!;
 
-            if (!produit) {
-              throw new Error("Produit introuvable");
-            }
-
-            return {
-              produitId: produit.id,
-              quantite: i.quantite || 1,
-
-              // 🔥 SNAPSHOT (clé du succès)
-              nom: produit.nom,
-              prix: produit.prix,
-              image: produit.images?.[0] || null,
-            };
-          }),
+              return {
+                produitId: produit.id,
+                quantite: i.quantite || 1,
+                nom: produit.nom,
+                prix: produit.prix,
+                image: produit.images?.[0] || null,
+              };
+            }),
         },
       },
       include: {
@@ -134,7 +155,7 @@ export async function POST(req: Request) {
   }
 }
 
-// 🔹 PATCH (update statut)
+// 🔹 PATCH
 export async function PATCH(req: Request) {
   try {
     const { id, statut } = await req.json();
@@ -149,10 +170,7 @@ export async function PATCH(req: Request) {
     const updated = await prisma.commande.update({
       where: { id },
       data: { statut },
-      include: {
-        client: true,
-        items: true,
-      },
+      include: { client: true, items: true },
     });
 
     return NextResponse.json(formatCommande(updated));
@@ -174,7 +192,6 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // 🔥 Supprimer les items d'abord (sécurité)
     await prisma.commandeItem.deleteMany({
       where: { commandeId: id },
     });
@@ -183,18 +200,12 @@ export async function DELETE(req: Request) {
       where: { id },
     });
 
-    return NextResponse.json({
-      message: "Commande supprimée",
-    });
+    return NextResponse.json({ message: "Commande supprimée" });
   } catch (error) {
     console.error("❌ DELETE commande :", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
-}   
-
-
-
-
+}  
 
 
 
