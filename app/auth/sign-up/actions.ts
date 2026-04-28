@@ -25,18 +25,10 @@ export async function signUpWithEmail(
 
   // 👉 Création du compte
   const { error } = await auth.signUp.email({
-    email,
-    password,
-    name,
-
-    // 💡 on stocke les infos supplémentaires ici
-    // dépend de ton auth provider (BetterAuth / Lucia / custom)
-    data: {
-      phone,
-      city,
-      address,
-    },
-  });
+  email,
+  password,
+  name: name?.trim(), 
+});  
 
   if (error) {
     return { error: error.message || 'Failed to create account' };
