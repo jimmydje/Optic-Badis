@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -13,7 +13,7 @@ interface Product {
   categorie?: string;
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
 
@@ -35,6 +35,7 @@ export default function SearchPage() {
     };
 
     if (query) fetchProducts();
+    else setLoading(false);
   }, [query]);
 
   return (
@@ -66,5 +67,13 @@ export default function SearchPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950 text-white px-6 py-20">Chargement...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }  

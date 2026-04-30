@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 interface Produit {
   id: string;
@@ -13,7 +13,7 @@ interface Produit {
   images?: string[];
 }
 
-export default function ProduitsPage() {
+function ProduitsContent() {
   const router = useRouter();
   const searchParams = useSearchParams(); // ✅ Next.js client
   const search = searchParams.get("search") || ""; // récupérer search param
@@ -186,5 +186,13 @@ export default function ProduitsPage() {
         </table>
       </div>
     </div>
+  );
+}
+
+export default function ProduitsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center">Chargement de la page...</div>}>
+      <ProduitsContent />
+    </Suspense>
   );
 }
