@@ -24,6 +24,24 @@ export default function HomePage() {
     return "/images/image1.jpg";
   };
 
+  // ✅ ROUTING CORRECT
+  const getProductLink = (produit: Produit) => {
+    switch (produit.categorie) {
+      case "homme":
+        return `/homme/${produit.id}`;
+      case "femme":
+        return `/femme/${produit.id}`;
+      case "solaire.homme":
+        return `/solaire/hommes/${produit.id}`;
+      case "solaire.femme":
+        return `/solaire/femmes/${produit.id}`;
+      case "enfants":
+        return `/enfants/${produit.id}`;
+      default:
+        return `/homme/${produit.id}`; // fallback
+    }
+  };
+
   useEffect(() => {
     fetch("/api/produits?limit=3")
       .then((res) => res.json())
@@ -104,7 +122,6 @@ export default function HomePage() {
       <section className="py-16 px-4 bg-[#212E53]">
         <div className="max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 items-center">
 
-          {/* TEXTE */}
           <div className="text-center md:text-left order-1 max-w-xl mx-auto md:mx-0">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-6 text-white">
               Notre histoire
@@ -115,7 +132,6 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* IMAGE */}
           <div className="relative h-48 sm:h-64 md:h-80 w-full rounded-2xl overflow-hidden order-2">
             <Image
               src="/images/image5.jpg"
@@ -128,28 +144,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* MARQUES */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-10">
-            Nos marques
-          </h2>
-
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-            {["rayban", "oakley", "police", "gucci", "prada", "dior"].map((b) => (
-              <Image
-                key={b}
-                src={`/brands/${b}.png`}
-                alt={b}
-                width={100}
-                height={50}
-                className="mx-auto opacity-70 hover:opacity-100 transition"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* PRODUITS */}
       <section className="py-16 px-4 bg-neutral-200">
         <div className="max-w-6xl mx-auto">
@@ -159,8 +153,8 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {produits.map((p) => (
-              <Link key={p.id} href={`/produit/${p.id}`}>
-                <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition">
+              <Link key={p.id} href={getProductLink(p)}>
+                <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer">
 
                   <div className="relative h-56">
                     <Image
@@ -185,30 +179,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CONTACT */}
-      <section className="py-16 px-4 bg-neutral-100">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-6">
-            Contact
-          </h2>
-
-          <p className="text-sm sm:text-base text-neutral-600 mb-8">
-            Notre équipe est disponible pour vous aider.
-          </p>
-
-          <div className="space-y-3 text-sm sm:text-base">
-            <p>📍 Annaba, Algérie</p>
-            <p>📞 +213 550 35 27 02</p>
-            <p>🕒 9h - 20h</p>
-          </div>
-        </div>
-      </section>
-
     </div>
   );
 }
-
-
 
 
 
