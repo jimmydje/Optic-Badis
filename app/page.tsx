@@ -36,7 +36,7 @@ export default function HomePage() {
   return (
     <div className="w-full text-black bg-neutral-100">
 
-      {/* HERO RESPONSIVE */}
+      {/* HERO */}
       <section className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] flex items-center justify-center text-center overflow-hidden">
         <Image
           src="/images/image1.jpg"
@@ -47,49 +47,50 @@ export default function HomePage() {
           className="object-cover"
         />
 
-        <div className="absolute inset-0 bg-black/50 sm:bg-black/40" />
+        <div className="absolute inset-0 bg-black/40" />
 
-        <div className="relative z-10 max-w-3xl px-4 sm:px-6 text-white">
-          <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">
+        <div className="relative z-10 max-w-3xl px-4 text-white">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold">
             Une vision claire, un style affirmé
           </h1>
 
-          <p className="mt-4 sm:mt-6 text-sm sm:text-lg text-neutral-200">
+          <p className="mt-4 text-sm sm:text-lg text-neutral-200">
             Badis Optic vous accompagne avec des solutions optiques modernes.
           </p>
 
           <Link href="/promotions">
-            <button className="mt-6 sm:mt-10 px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition text-sm sm:text-base">
+            <button className="mt-6 px-6 py-2 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
               Découvrir nos promotions
             </button>
           </Link>
         </div>
       </section>
 
-      {/* CATÉGORIES MOBILE FIX */}
-      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-white">
+      {/* CATÉGORIES */}
+      <section className="py-14 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-10">
             Nos catégories
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {[
               { href: "/homme", img: "/images/image2.jpg", label: "HOMME" },
               { href: "/femme", img: "/images/image3.jpg", label: "FEMME" },
-              { href: "/solaire/hommes", img: "/images/image4.jpg", label: "SOLAIRE H" },
-              { href: "/solaire/femmes", img: "/images/image6.jpg", label: "SOLAIRE F" },
+              { href: "/solaire/hommes", img: "/images/image4.jpg", label: "SOLAIRE Homme" },
+              { href: "/solaire/femmes", img: "/images/image6.jpg", label: "SOLAIRE Femme" },
               { href: "/enfants", img: "/images/image7.jpg", label: "ENFANTS" },
             ].map((cat) => (
               <Link key={cat.href} href={cat.href}>
-                <div className="relative h-40 sm:h-52 rounded-xl sm:rounded-2xl overflow-hidden">
+                <div className="relative h-52 sm:h-60 rounded-2xl overflow-hidden">
                   <Image
                     src={cat.img}
                     alt={cat.label}
                     fill
                     className="object-cover hover:scale-110 transition"
                   />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-sm sm:text-lg font-semibold">
+
+                  <div className="absolute inset-0 bg-black/25 flex items-center justify-center text-white text-lg font-semibold">
                     {cat.label}
                   </div>
                 </div>
@@ -99,20 +100,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* HISTOIRE MOBILE */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-[#212E53]">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 sm:gap-14 items-center">
-          <div className="text-center md:text-left">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-4 sm:mb-6 text-white">
+      {/* HISTOIRE */}
+      <section className="py-16 px-4 bg-[#212E53]">
+        <div className="max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 items-center">
+
+          {/* TEXTE */}
+          <div className="text-center md:text-left order-1 max-w-xl mx-auto md:mx-0">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-6 text-white">
               Notre histoire
             </h2>
 
             <p className="text-white text-sm sm:text-base leading-relaxed">
-              Badis Optic est né d’une passion pour la vision et le style.
+              Badis Optic est né d’une passion profonde pour la vision et le style, avec la volonté de proposer bien plus que de simples lunettes : une véritable expérience alliant confort visuel et élégance. Depuis sa création, la marque s’engage à offrir des produits de qualité, soigneusement sélectionnés pour répondre aux besoins de chacun, tout en suivant les dernières tendances. Grâce à un savoir-faire professionnel et une attention particulière aux détails, Badis Optic accompagne ses clients dans le choix de montures qui reflètent leur personnalité et s’adaptent à leur quotidien. Plus qu’une simple boutique, Badis Optic incarne une vision moderne de l’optique, où bien voir rime avec confiance et style.
             </p>
           </div>
 
-          <div className="relative h-56 sm:h-80 rounded-2xl overflow-hidden">
+          {/* IMAGE */}
+          <div className="relative h-48 sm:h-64 md:h-80 w-full rounded-2xl overflow-hidden order-2">
             <Image
               src="/images/image5.jpg"
               alt="Boutique"
@@ -120,17 +124,18 @@ export default function HomePage() {
               className="object-cover"
             />
           </div>
+
         </div>
       </section>
 
-      {/* MARQUES MOBILE */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
+      {/* MARQUES */}
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-10">
             Nos marques
           </h2>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6 sm:gap-10">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
             {["rayban", "oakley", "police", "gucci", "prada", "dior"].map((b) => (
               <Image
                 key={b}
@@ -145,18 +150,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PRODUITS MOBILE FIX */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-neutral-200">
+      {/* PRODUITS */}
+      <section className="py-16 px-4 bg-neutral-200">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-10">
             Nouveautés
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {produits.map((p) => (
               <Link key={p.id} href={`/produit/${p.id}`}>
                 <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition">
-                  <div className="relative h-56 sm:h-64">
+
+                  <div className="relative h-56">
                     <Image
                       src={getImageSrc(p.images?.[0])}
                       alt={p.nom}
@@ -166,13 +172,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="bg-[#212E53] text-white p-4">
-                    <p className="text-sm sm:text-base font-semibold">
-                      {p.nom}
-                    </p>
+                    <p className="font-semibold">{p.nom}</p>
                     <p className="text-xs text-neutral-300">
                       {p.categorie ?? "Optique"}
                     </p>
                   </div>
+
                 </div>
               </Link>
             ))}
@@ -180,18 +185,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CONTACT MOBILE */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-neutral-100">
+      {/* CONTACT */}
+      <section className="py-16 px-4 bg-neutral-100">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-6">
             Contact
           </h2>
 
-          <p className="text-sm sm:text-base text-neutral-600 mb-10">
+          <p className="text-sm sm:text-base text-neutral-600 mb-8">
             Notre équipe est disponible pour vous aider.
           </p>
 
-          <div className="text-sm sm:text-base space-y-4">
+          <div className="space-y-3 text-sm sm:text-base">
             <p>📍 Annaba, Algérie</p>
             <p>📞 +213 550 35 27 02</p>
             <p>🕒 9h - 20h</p>
@@ -202,9 +207,6 @@ export default function HomePage() {
     </div>
   );
 }
-
-
-
 
 
 
