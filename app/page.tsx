@@ -83,8 +83,8 @@ export default function HomePage() {
             {[
               { href: "/homme", img: "/images/image2.jpg", label: "OPTIQUE HOMME" },
               { href: "/femme", img: "/images/image3.jpg", label: "OPTIQUE FEMME" },
-              { href: "/solaire.homme", img: "/images/image4.jpg", label: "SOLAIRE HOMME" },
-              { href: "/solaire.femme", img: "/images/image6.jpg", label: "SOLAIRE FEMME" },
+              { href: "/solaire/hommes", img: "/images/image4.jpg", label: "SOLAIRE HOMME" },
+              { href: "/solaire/femmes", img: "/images/image6.jpg", label: "SOLAIRE FEMME" },
               { href: "/enfants", img: "/images/image7.jpg", label: "ENFANTS" },
             ].map((cat) => (
               <Link key={cat.href} href={cat.href}>
@@ -189,7 +189,7 @@ export default function HomePage() {
                       </div>
 
                       {/* BOTTOM BAR */}
-                      <div className="bg-black text-white px-4 py-3 flex flex-col gap-1">
+                      <div className="bg-[#212E53] text-white px-4 py-3 flex flex-col gap-1">
                         <p className="text-xs text-neutral-300">
                           Achetez avec paiement à la livraison
                         </p>
@@ -244,7 +244,7 @@ export default function HomePage() {
 
     </div>
   );
-}  
+}
 
 
 

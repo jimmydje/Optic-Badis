@@ -13,7 +13,6 @@ interface Product {
   promotion?: number | null;
 }
 
-// 🔹 SECTION REUTILISABLE
 function Section({
   title,
   pack,
@@ -23,95 +22,93 @@ function Section({
   pack: string;
   products: Product[];
 }) {
-  if (products.length === 0) return null;
+  if (!products || products.length === 0) return null;
 
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* TITRE */}
-      <h2 className="text-2xl md:text-3xl font-semibold text-[#212E53] mb-2">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-0">
+      {/* TITLE */}
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#212E53] mb-2 text-center sm:text-left">
         {title}
       </h2>
-      <p className="text-neutral-500 mb-8">{pack}</p>
+
+      <p className="text-neutral-500 mb-6 sm:mb-8 text-center sm:text-left text-sm sm:text-base">
+        {pack}
+      </p>
 
       {/* GRID */}
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
         {products.map((prod) => (
           <Link
             key={prod.id}
             href={`/promotions/${prod.id}`}
-            className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer"
+            className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition block"
           >
             {/* IMAGE */}
-            <div className="relative h-56 w-full bg-neutral-100">
+            <div className="relative h-44 sm:h-52 md:h-56 w-full bg-neutral-100">
               {prod.imageUrl ? (
                 <Image
                   src={prod.imageUrl}
                   alt={prod.nom}
                   fill
-                  className="object-contain p-4 group-hover:scale-105 transition"
+                  className="object-contain p-3 sm:p-4 group-hover:scale-105 transition"
                 />
               ) : (
-                <div className="flex items-center justify-center h-full text-neutral-400">
+                <div className="flex items-center justify-center h-full text-neutral-400 text-sm">
                   No Image
                 </div>
               )}
 
-              {/* BADGE PROMO */}
-              <span className="absolute top-3 left-3 bg-[#212E53] text-white text-xs px-3 py-1 rounded-full">
-                -{prod.promotion}%
+              {/* BADGE */}
+              <span className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-[#212E53] text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full">
+                -{Number(prod.promotion) || 0}%
               </span>
             </div>
 
             {/* INFOS */}
-            <div className="p-6">
-              <h3 className="text-lg font-medium text-black group-hover:underline">
+            <div className="p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-medium text-black">
                 {prod.nom}
               </h3>
 
-              <p className="text-sm text-neutral-500 mt-1">
+              <p className="text-xs sm:text-sm text-neutral-500 mt-1 line-clamp-2">
                 {prod.description ?? "Description non disponible"}
               </p>
 
-              <p className="mt-4 text-xl font-semibold text-[#212E53]">
+              <p className="mt-3 sm:mt-4 text-lg sm:text-xl font-semibold text-[#212E53]">
                 {prod.prix} DA
               </p>
 
-             <Link
-  href={`/promotions/${prod.id}`}
-  className="block text-center w-full mt-4 py-3 rounded-full bg-[#212E53] text-white hover:opacity-90 transition"
->
-  Voir l’offre
-</Link>  
+              {/* BOUTON (VISUEL UNIQUEMENT) */}
+              <div className="mt-3 sm:mt-4">
+                <span className="block text-center w-full py-2 sm:py-3 rounded-full bg-[#212E53] text-white text-sm sm:text-base group-hover:opacity-90 transition">
+                  Voir l’offre
+                </span>
+              </div>
             </div>
           </Link>
         ))}
+
       </div>
     </div>
   );
 }
 
-// 🔹 PAGE PRINCIPALE
 export default function PromotionsPage() {
-  const [p20, setP20] = useState<Product[]>([]);
-  const [p30, setP30] = useState<Product[]>([]);
-  const [p35, setP35] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
-        const res = await fetch("/api/promotions");
+        const res = await fetch("/api/promotions", {
+          cache: "no-store",
+        });
+
         const data = await res.json();
+        const list: Product[] = data?.promotions ?? [];
 
-        const promotions = Array.isArray(data)
-          ? data
-          : Array.isArray(data.promotions)
-          ? data.promotions
-          : [];
-
-        setP20(promotions.filter((p: Product) => p.promotion === 20));
-        setP30(promotions.filter((p: Product) => p.promotion === 30));
-        setP35(promotions.filter((p: Product) => p.promotion === 35));
+        setProducts(list);
       } catch (err) {
         console.error("Erreur chargement promotions :", err);
       } finally {
@@ -130,15 +127,20 @@ export default function PromotionsPage() {
     );
   }
 
+  const p20 = products.filter((p) => Number(p.promotion) === 20);
+  const p30 = products.filter((p) => Number(p.promotion) === 30);
+  const p35 = products.filter((p) => Number(p.promotion) === 35);
+
   return (
-    <div className="min-h-screen bg-neutral-100 py-20 px-6 space-y-20">
+    <div className="min-h-screen bg-neutral-100 py-10 sm:py-16 lg:py-20 px-4 sm:px-6 space-y-16 sm:space-y-20">
 
       {/* HEADER */}
-      <div className="text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-semibold text-[#212E53] mb-6">
+      <div className="text-center max-w-3xl mx-auto px-2">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#212E53] mb-4 sm:mb-6">
           Nos Promotions
         </h1>
-        <p className="text-neutral-600">
+
+        <p className="text-sm sm:text-base text-neutral-600">
           Profitez de nos offres exclusives sur une sélection de lunettes et lentilles.
         </p>
       </div>
@@ -148,13 +150,11 @@ export default function PromotionsPage() {
       <Section title="Promotion -30%" pack="Pack Premium" products={p30} />
       <Section title="Promotion -35%" pack="Pack Luxe" products={p35} />
 
-      {/* EMPTY */}
-      {p20.length === 0 && p30.length === 0 && p35.length === 0 && (
-        <p className="text-center text-neutral-500">
+      {products.length === 0 && (
+        <p className="text-center text-neutral-500 text-sm sm:text-base">
           Aucune promotion disponible pour le moment.
         </p>
       )}
-
     </div>
   );
 }  

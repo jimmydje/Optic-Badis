@@ -1,24 +1,40 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+/* =======================
+   GET ALL PROMOTIONS
+======================= */
 export async function GET() {
   try {
     const promotions = await prisma.promotion.findMany({
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(promotions);
+
+    // ✅ format stable pour frontend
+    return NextResponse.json({ promotions });
   } catch (err) {
-    return NextResponse.json({ error: "Erreur lors du chargement" }, { status: 500 });
+    console.error(err);
+    return NextResponse.json(
+      { error: "Erreur lors du chargement" },
+      { status: 500 }
+    );
   }
 }
 
+/* =======================
+   CREATE PROMOTION
+======================= */
 export async function POST(req: Request) {
   try {
-    const { nom, description, prix, promotion, imageUrl } = await req.json();
+    const { nom, description, prix, promotion, imageUrl } =
+      await req.json();
 
-    if (!nom || prix === undefined || promotion === undefined) {
+    const prixNumber = Number(prix);
+    const promoNumber = Number(promotion);
+
+    if (!nom || isNaN(prixNumber) || isNaN(promoNumber)) {
       return NextResponse.json(
-        { error: "Nom, prix et promotion sont obligatoires" },
+        { error: "Nom, prix et promotion obligatoires" },
         { status: 400 }
       );
     }
@@ -27,28 +43,39 @@ export async function POST(req: Request) {
       data: {
         nom,
         description,
-        prix: Number(prix),
-        promotion: Number(promotion),
+        prix: prixNumber,
+        promotion: promoNumber,
         imageUrl,
       },
     });
 
     return NextResponse.json(newPromo, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ error: "Erreur lors de la création" }, { status: 500 });
+    console.error(err);
+    return NextResponse.json(
+      { error: "Erreur lors de la création" },
+      { status: 500 }
+    );
   }
 }
 
+/* =======================
+   UPDATE PROMOTION
+======================= */
 export async function PUT(req: Request) {
   try {
-    const { id, nom, description, prix, promotion, imageUrl } = await req.json();
+    const { id, nom, description, prix, promotion, imageUrl } =
+      await req.json();
 
     if (!id) {
-      return NextResponse.json({ error: "ID manquant" }, { status: 400 });
+      return NextResponse.json(
+        { error: "ID manquant" },
+        { status: 400 }
+      );
     }
 
     const updatedPromo = await prisma.promotion.update({
-      where: { id },
+      where: { id }, // ✅ STRING ID (cuid)
       data: {
         nom,
         description,
@@ -60,22 +87,40 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(updatedPromo);
   } catch (err) {
-    return NextResponse.json({ error: "Erreur lors de la modification" }, { status: 500 });
+    console.error(err);
+    return NextResponse.json(
+      { error: "Erreur lors de la modification" },
+      { status: 500 }
+    );
   }
 }
 
+/* =======================
+   DELETE PROMOTION
+======================= */
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
 
     if (!id) {
-      return NextResponse.json({ error: "ID manquant" }, { status: 400 });
+      return NextResponse.json(
+        { error: "ID manquant" },
+        { status: 400 }
+      );
     }
 
-    await prisma.promotion.delete({ where: { id } });
+    await prisma.promotion.delete({
+      where: { id }, // ✅ CORRIGÉ (PAS Number)
+    });
 
-    return NextResponse.json({ message: "Promotion supprimée" });
+    return NextResponse.json({
+      message: "Promotion supprimée",
+    });
   } catch (err) {
-    return NextResponse.json({ error: "Erreur lors de la suppression" }, { status: 500 });
+    console.error(err);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression" },
+      { status: 500 }
+    );
   }
-}
+} 
