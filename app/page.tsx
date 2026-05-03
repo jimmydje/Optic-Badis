@@ -56,17 +56,26 @@ export default function HomePage() {
   return (
     <div className="w-full text-black bg-neutral-100">
 
-     {/* HERO */}
+    {/* HERO */}
 <section className="relative h-[100dvh] sm:h-[90vh] flex items-center justify-center text-center overflow-hidden">
-  
+
+  {/* IMAGE MOBILE */}
   <Image
-    src="/images/image1.jpg"
-    alt="Badis Optic"
+    src="/images/123.jpg"
+    alt="Badis Optic mobile"
     fill
     priority
-    sizes="100vw"
-    className="object-cover"
+    className="object-cover block sm:hidden"
   />
+
+  {/* IMAGE DESKTOP */}
+  <Image
+    src="/images/image1.jpg" 
+    alt="Badis Optic desktop"
+    fill
+    priority
+    className="object-cover hidden sm:block"
+  /> 
 
   {/* overlay */}
   <div className="absolute inset-0 bg-black/40" />
@@ -88,7 +97,8 @@ export default function HomePage() {
     </Link>
   </div>
 
-</section> 
+</section>
+
       {/* CATÉGORIES */}
       <section className="py-14 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
