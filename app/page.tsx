@@ -166,7 +166,7 @@ export default function HomePage() {
     {/* HEADER */}
     <div className="flex justify-between items-center mb-10">
      <h2 className="text-4xl font-bold tracking-tight text-center w-full">
-  PRODUITS
+  Nouveautés 
 </h2> 
      
     </div>
