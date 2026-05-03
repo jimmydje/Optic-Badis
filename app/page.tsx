@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface Produit {
+  prix: any;
+  marque: string;
   id: string;
   nom: string;
   images: string[];
@@ -54,36 +56,39 @@ export default function HomePage() {
   return (
     <div className="w-full text-black bg-neutral-100">
 
-      {/* HERO */}
-      <section className="relative h-[70vh] sm:h-[80vh] md:h-[90vh] flex items-center justify-center text-center overflow-hidden">
-        <Image
-          src="/images/image1.jpg"
-          alt="Badis Optic"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
+     {/* HERO */}
+<section className="relative h-[100dvh] sm:h-[90vh] flex items-center justify-center text-center overflow-hidden">
+  
+  <Image
+    src="/images/image1.jpg"
+    alt="Badis Optic"
+    fill
+    priority
+    sizes="100vw"
+    className="object-cover"
+  />
 
-        <div className="absolute inset-0 bg-black/40" />
+  {/* overlay */}
+  <div className="absolute inset-0 bg-black/40" />
 
-        <div className="relative z-10 max-w-3xl px-4 text-white">
-          <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold">
-            Une vision claire, un style affirmé
-          </h1>
+  {/* content */}
+  <div className="relative z-10 max-w-3xl px-4 text-white">
+    <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">
+      Une vision claire, un style affirmé
+    </h1>
 
-          <p className="mt-4 text-sm sm:text-lg text-neutral-200">
-            Badis Optic vous accompagne avec des solutions optiques modernes.
-          </p>
+    <p className="mt-4 text-sm sm:text-lg text-neutral-200">
+      Badis Optic vous accompagne avec des solutions optiques modernes.
+    </p>
 
-          <Link href="/promotions">
-            <button className="mt-6 px-6 py-2 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
-              Découvrir nos promotions
-            </button>
-          </Link>
-        </div>
-      </section>
+    <Link href="/promotions">
+      <button className="mt-6 px-6 py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
+        Découvrir nos promotions
+      </button>
+    </Link>
+  </div>
 
+</section> 
       {/* CATÉGORIES */}
       <section className="py-14 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -119,7 +124,7 @@ export default function HomePage() {
       </section>
 
       {/* HISTOIRE */}
-      <section className="py-16 px-4 bg-[#212E53]">
+      <section className="py-16 px-4 bg-[#B67332]">  
         <div className="max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 items-center">
 
           <div className="text-center md:text-left order-1 max-w-xl mx-auto md:mx-0">
@@ -144,41 +149,81 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PRODUITS */}
-      <section className="py-16 px-4 bg-neutral-200">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-10">
-            Nouveautés
-          </h2>
+     {/* PRODUITS */}
+<section className="py-16 px-4 bg-[#f5f5f5]">
+  <div className="max-w-7xl mx-auto">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {produits.map((p) => (
-              <Link key={p.id} href={getProductLink(p)}>
-                <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer">
+    {/* HEADER */}
+    <div className="flex justify-between items-center mb-10">
+     <h2 className="text-4xl font-bold tracking-tight text-center w-full">
+  PRODUITS
+</h2> 
+     
+    </div>
 
-                  <div className="relative h-56">
-                    <Image
-                      src={getImageSrc(p.images?.[0])}
-                      alt={p.nom}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+    {/* PRODUITS CENTRÉS */}
+    <div className="flex justify-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl">
 
-                  <div className="bg-[#212E53] text-white p-4">
-                    <p className="font-semibold">{p.nom}</p>
-                    <p className="text-xs text-neutral-300">
-                      {p.categorie ?? "Optique"}
-                    </p>
-                  </div>
+        {produits.slice(0, 3).map((p) => (
+          <Link key={p.id} href={getProductLink(p)}>
 
+            <div className="group cursor-pointer">
+
+              {/* CARD */}
+              <div className="relative bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
+
+                {/* IMAGE */}
+                <div className="h-60 flex items-center justify-center bg-[#f9f9f9] p-4">
+                  <Image
+                    src={getImageSrc(p.images?.[0])}
+                    alt={p.nom}
+                    width={300}
+                    height={200}
+                    className="object-contain max-h-full w-auto transition duration-300 group-hover:scale-105"
+                  />
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
+                {/* BANDE NOIRE */}
+                <div className="absolute bottom-0 left-0 w-full bg-black text-white py-3 px-4 flex items-center gap-2 text-sm font-medium">
+                  
+                  {/* ICON */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7M9 7V5a3 3 0 016 0v2" />
+                  </svg>
+
+                  Achetez avec paiement à la livraison
+                </div>
+
+              </div>
+
+              {/* INFOS */}
+              <div className="mt-3">
+                <p className="font-semibold text-gray-900 text-sm">
+                  {p.nom}
+                </p>
+
+                <p className="text-gray-600 text-sm">
+                  {new Intl.NumberFormat("fr-DZ").format(p.prix)} DA
+                </p>
+              </div>
+
+            </div>
+
+          </Link>
+        ))}
+
+      </div>
+    </div>
+
+  </div>
+</section> 
     </div>
   );
 }

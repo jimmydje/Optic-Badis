@@ -90,10 +90,10 @@ export default function Navbar() {
             </span>
 
             {openMenu === "solaire" && (
-              <div className="absolute top-full mt-3 w-56 bg-white border shadow-lg rounded-xl p-4 animate-fadeIn">
-                <Link href="/solaire/hommes" className="block py-2 hover:text-[#212E53]">
-                  HOMME
-                </Link>
+              <div className="absolute left-0 top-full mt-2 w-56 bg-[#DAAB3A] rounded-xl p-4 shadow-lg z-50">
+                <Link href="/solaire/hommes" className="block py-2 hover:text-[#212E53]"> 
+                  HOMME 
+                </Link> 
                 <Link href="/solaire/femmes" className="block py-2 hover:text-[#212E53]">
                   FEMME
                 </Link>
@@ -112,8 +112,8 @@ export default function Navbar() {
             </span>
 
             {openMenu === "optique" && (
-              <div className="absolute top-full mt-3 w-56 bg-white border shadow-lg rounded-xl p-4 animate-fadeIn">
-                <Link href="/homme" className="block py-2 hover:text-[#212E53]">
+              <div className="absolute left-0 top-full mt-2 w-56 bg-[#DAAB3A] rounded-xl p-4 shadow-lg z-50">
+                <Link href="/homme" className="block py-2 hover:text-[#212E53]"> 
                   HOMME
                 </Link>
                 <Link href="/femme" className="block py-2 hover:text-[#212E53]">
@@ -182,98 +182,133 @@ export default function Navbar() {
           <Menu size={26} />
         </button>
       </div>
+{/* MOBILE MENU */}
+<div
+  className={`fixed top-0 right-0 h-full w-[75%] bg-white shadow-lg z-50 transition-transform duration-300 ${
+    mobileOpen ? "translate-x-0" : "translate-x-full"
+  }`}
+>
+  <div className="p-6 flex flex-col gap-6">
 
-      {/* MOBILE MENU */}
-      <div
-        className={`fixed top-0 right-0 h-full w-[75%] bg-white shadow-lg z-50 transition-transform duration-300 ${
-          mobileOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+    {/* HEADER */}
+    <div className="flex justify-between items-center">
+      <h2 className="font-semibold text-lg">Menu</h2>
+      <button onClick={() => setMobileOpen(false)}>
+        <X />
+      </button>
+    </div>
+
+    {/* SOLAIRE MOBILE */}
+    <div>
+      <button
+        onClick={() => toggleMobileMenu("solaire")}
+        className="w-full text-left font-medium"
       >
-        <div className="p-6 flex flex-col gap-6">
+        LUNETTES SOLAIRES
+      </button>
 
-          {/* HEADER */}
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold">Menu</h2>
-            <button onClick={() => setMobileOpen(false)}>
-              <X />
-            </button>
-          </div>
-
-          {/* SOLAIRE MOBILE */}
-          <div>
-            <button
-              onClick={() => toggleMobileMenu("solaire")}
-              className="w-full text-left font-medium"
-            >
-              LUNETTES SOLAIRES
-            </button>
-
-            {mobileMenuOpen === "solaire" && (
-              <div className="pl-4 mt-2 flex flex-col gap-2 text-sm text-gray-600">
-                <Link href="/solaire/hommes" onClick={() => setMobileOpen(false)}>
-                  HOMME
-                </Link>
-                <Link href="/solaire/femmes" onClick={() => setMobileOpen(false)}>
-                  FEMME
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* OPTIQUE MOBILE */}
-          <div>
-            <button
-              onClick={() => toggleMobileMenu("optique")}
-              className="w-full text-left font-medium"
-            >
-              LUNETTES OPTIQUES
-            </button>
-
-            {mobileMenuOpen === "optique" && (
-              <div className="pl-4 mt-2 flex flex-col gap-2 text-sm text-gray-600">
-                <Link href="/homme" onClick={() => setMobileOpen(false)}>
-                  HOMME
-                </Link>
-                <Link href="/femme" onClick={() => setMobileOpen(false)}>
-                  FEMME
-                </Link>
-                <Link href="/enfants" onClick={() => setMobileOpen(false)}>
-                  ENFANTS
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <Link href="/lentilles" onClick={() => setMobileOpen(false)}>
-            LENTILLES
+      {mobileMenuOpen === "solaire" && (
+        <div className="pl-4 mt-2 flex flex-col gap-2 text-sm">
+          <Link
+            href="/solaire/hommes"
+            onClick={() => setMobileOpen(false)}
+            className="text-[#B67332] font-medium hover:underline transition"
+          >
+            HOMME
           </Link>
 
-          {/* SEARCH */}
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Recherche"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border px-2 py-1 w-full"
-            />
-            <button type="submit">
-              <Search size={18} />
-            </button>
-          </form>
-
-          <Link href="/panier" onClick={() => setMobileOpen(false)}>
-            Panier
+          <Link
+            href="/solaire/femmes"
+            onClick={() => setMobileOpen(false)}
+            className="text-[#B67332] font-medium hover:underline transition"
+          >
+            FEMME
           </Link>
-
-          {session?.user ? (
-            <button onClick={handleLogout}>Logout</button>
-          ) : (
-            <Link href="/auth/sign-in">Sign in</Link>
-          )}
         </div>
-      </div>
+      )}
+    </div>
 
+    {/* OPTIQUE MOBILE */}
+    <div>
+      <button
+        onClick={() => toggleMobileMenu("optique")}
+        className="w-full text-left font-medium"
+      >
+        LUNETTES OPTIQUES
+      </button>
+
+      {mobileMenuOpen === "optique" && (
+        <div className="pl-4 mt-2 flex flex-col gap-2 text-sm">
+          <Link
+            href="/homme"
+            onClick={() => setMobileOpen(false)}
+            className="text-[#B67332] font-medium hover:underline transition"
+          >
+            HOMME
+          </Link>
+
+          <Link
+            href="/femme"
+            onClick={() => setMobileOpen(false)}
+            className="text-[#B67332] font-medium hover:underline transition"
+          >
+            FEMME
+          </Link>
+
+          <Link
+            href="/enfants"
+            onClick={() => setMobileOpen(false)}
+            className="text-[#B67332] font-medium hover:underline transition"
+          >
+            ENFANTS
+          </Link>
+        </div>
+      )}
+    </div>
+
+    <Link href="/lentilles" onClick={() => setMobileOpen(false)}>
+      LENTILLES
+    </Link>
+
+    {/* 🔍 SEARCH OVALE */}
+    <form
+      onSubmit={handleSearch}
+      className="flex items-center bg-gray-100 rounded-full px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-black/20 transition"
+    >
+      <input
+        type="text"
+        placeholder="Recherche..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="bg-transparent outline-none text-sm flex-1"
+      />
+
+      <button type="submit">
+        <Search className="w-5 h-5 text-gray-500" />
+      </button>
+    </form>
+
+    {/* 🧑 USER + 🛒 PANIER */}
+    <div className="flex items-center justify-center gap-8 pt-4">
+
+      <Link href="/panier" onClick={() => setMobileOpen(false)}>
+        <ShoppingCart className="w-7 h-7 text-gray-700 hover:text-black transition" />
+      </Link>
+
+      {session?.user ? (
+        <button onClick={handleLogout}>
+          <LogOut className="w-7 h-7 text-gray-700 hover:text-red-500 transition" />
+        </button>
+      ) : (
+        <Link href="/auth/sign-in">
+          <User className="w-7 h-7 text-gray-700 hover:text-black transition" />
+        </Link>
+      )}
+
+    </div>
+
+  </div>
+</div> 
       {/* BACKDROP */}
       {mobileOpen && (
         <div
