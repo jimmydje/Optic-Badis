@@ -26,7 +26,6 @@ export default function HomePage() {
     return "/images/image1.jpg";
   };
 
-  // ✅ ROUTING CORRECT
   const getProductLink = (produit: Produit) => {
     switch (produit.categorie) {
       case "homme":
@@ -40,7 +39,7 @@ export default function HomePage() {
       case "enfants":
         return `/enfants/${produit.id}`;
       default:
-        return `/homme/${produit.id}`; // fallback
+        return `/homme/${produit.id}`;
     }
   };
 
@@ -56,48 +55,45 @@ export default function HomePage() {
   return (
     <div className="w-full text-black bg-neutral-100">
 
-    {/* HERO */}
-<section className="relative h-[100dvh] sm:h-[90vh] flex items-center justify-center text-center overflow-hidden">
+      {/* HERO */}
+      <section className="relative h-[100dvh] sm:h-[90vh] flex items-center justify-center text-center overflow-hidden">
 
-  {/* IMAGE MOBILE */}
-  <Image
-    src="/images/123.jpg"
-    alt="Badis Optic mobile"
-    fill
-    priority
-    className="object-cover block sm:hidden"
-  />
+        <Image
+          src="/images/123.jpg"
+          alt="Badis Optic mobile"
+          fill
+          priority
+          className="object-cover block sm:hidden"
+        />
 
-  {/* IMAGE DESKTOP */}
-  <Image
-    src="/images/image1.jpg" 
-    alt="Badis Optic desktop"
-    fill
-    priority
-    className="object-cover hidden sm:block"
-  /> 
+        <Image
+          src="/images/image1.jpg"
+          alt="Badis Optic desktop"
+          fill
+          priority
+          className="object-cover hidden sm:block"
+        />
 
-  {/* overlay */}
-  <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-black/40" />
 
-  {/* content */}
-  <div className="relative z-10 max-w-3xl px-4 text-white">
-    <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">
-      Une vision claire, un style affirmé
-    </h1>
+        <div className="relative z-10 max-w-3xl px-4 text-white">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold leading-tight">
+            Une vision claire, un style affirmé
+          </h1>
 
-    <p className="mt-4 text-sm sm:text-lg text-neutral-200">
-      Badis Optic vous accompagne avec des solutions optiques modernes.
-    </p>
+          <p className="mt-4 text-sm sm:text-lg text-neutral-200">
+            Badis Optic vous accompagne avec des solutions optiques modernes.
+          </p>
 
-    <Link href="/promotions">
-      <button className="mt-6 px-6 py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
-        Découvrir nos promotions
-      </button>
-    </Link>
-  </div>
+          <Link href="/promotions">
+            <button className="mt-6 px-6 py-3 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition">
+              Découvrir nos promotions
+            </button>
+          </Link>
+        </div>
+      </section>
 
-</section>
+    
 
       {/* CATÉGORIES */}
       <section className="py-14 px-4 bg-white">
@@ -134,7 +130,7 @@ export default function HomePage() {
       </section>
 
       {/* HISTOIRE */}
-      <section className="py-16 px-4 bg-[#B67332]">  
+      <section className="py-16 px-4 bg-[#B67332]">
         <div className="max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-10 items-center">
 
           <div className="text-center md:text-left order-1 max-w-xl mx-auto md:mx-0">
@@ -143,7 +139,7 @@ export default function HomePage() {
             </h2>
 
             <p className="text-white text-sm sm:text-base leading-relaxed">
-              Badis Optic est né d’une passion profonde pour la vision et le style, avec la volonté de proposer bien plus que de simples lunettes : une véritable expérience alliant confort visuel et élégance. Depuis sa création, la marque s’engage à offrir des produits de qualité, soigneusement sélectionnés pour répondre aux besoins de chacun, tout en suivant les dernières tendances. Grâce à un savoir-faire professionnel et une attention particulière aux détails, Badis Optic accompagne ses clients dans le choix de montures qui reflètent leur personnalité et s’adaptent à leur quotidien. Plus qu’une simple boutique, Badis Optic incarne une vision moderne de l’optique, où bien voir rime avec confiance et style.
+              Badis Optic est né d’une passion profonde pour la vision et le style...
             </p>
           </div>
 
@@ -159,86 +155,75 @@ export default function HomePage() {
         </div>
       </section>
 
-     {/* PRODUITS */}
+  {/* 🔥 MARQUEE BADIS OPTIC */}
+     <section className="w-full overflow-hidden bg-black py-4">
+  <div className="animate-scroll flex items-center gap-16 whitespace-nowrap text-white text-2xl font-semibold uppercase tracking-[0.3em]">
+
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+
+    {/* duplication minimale pour loop */}
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    <span className="flex-shrink-0">BADIS OPTIC</span>
+    
+    
+
+  </div>
+</section> 
 <section className="py-16 px-4 bg-[#f5f5f5]">
-  <div className="max-w-7xl mx-auto">
+  <div className="w-full">
 
-    {/* HEADER */}
-    <div className="flex justify-between items-center mb-10">
-     <h2 className="text-4xl font-bold tracking-tight text-center w-full">
-  Nouveautés 
-</h2> 
-     
-    </div>
+    <h2 className="text-4xl font-bold text-center mb-10">
+      Nouveautés
+    </h2>
 
-    {/* PRODUITS CENTRÉS */}
-    <div className="flex justify-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl">
+    {/* FULL WIDTH GRID */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
 
-        {produits.slice(0, 3).map((p) => (
-          <Link key={p.id} href={getProductLink(p)}>
+      {produits.slice(0, 3).map((p) => (
+        <Link key={p.id} href={getProductLink(p)}>
+          <div className="group cursor-pointer">
 
-            <div className="group cursor-pointer">
+            <div className="relative bg-white rounded-2xl border overflow-hidden hover:shadow-lg transition">
 
-              {/* CARD */}
-              <div className="relative bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
-
-                {/* IMAGE */}
-                <div className="h-60 flex items-center justify-center bg-[#f9f9f9] p-4">
-                  <Image
-                    src={getImageSrc(p.images?.[0])}
-                    alt={p.nom}
-                    width={300}
-                    height={200}
-                    className="object-contain max-h-full w-auto transition duration-300 group-hover:scale-105"
-                  />
-                </div>
-
-                {/* BANDE NOIRE */}
-                <div className="absolute bottom-0 left-0 w-full bg-black text-white py-3 px-4 flex items-center gap-2 text-sm font-medium">
-                  
-                  {/* ICON */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M5 7v10a2 2 0 002 2h10a2 2 0 002-2V7M9 7V5a3 3 0 016 0v2" />
-                  </svg>
-
-                  Achetez avec paiement à la livraison
-                </div>
-
+              <div className="h-60 flex items-center justify-center bg-[#f9f9f9] p-4">
+                <Image
+                  src={getImageSrc(p.images?.[0])}
+                  alt={p.nom}
+                  width={300}
+                  height={200}
+                  className="object-contain max-h-full w-auto group-hover:scale-105 transition"
+                />
               </div>
 
-              {/* INFOS */}
-              <div className="mt-3">
-                <p className="font-semibold text-gray-900 text-sm">
-                  {p.nom}
-                </p>
-
-                <p className="text-gray-600 text-sm">
-                  {new Intl.NumberFormat("fr-DZ").format(p.prix)} DA
-                </p>
+              <div className="absolute bottom-0 left-0 w-full bg-black text-white py-3 px-4 text-sm">
+                Paiement à la livraison
               </div>
 
             </div>
 
-          </Link>
-        ))}
+            <div className="mt-3">
+              <p className="font-semibold text-sm">{p.nom}</p>
+              <p className="text-gray-600 text-sm">
+                {new Intl.NumberFormat("fr-DZ").format(p.prix)} DA
+              </p>
+            </div>
 
-      </div>
+          </div>
+        </Link>
+      ))}
+
     </div>
 
   </div>
 </section> 
     </div>
   );
-}
-
-
+} 
 
 
 

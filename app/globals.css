@@ -50,3 +50,16 @@ a:hover {
     --accent: #3b82f6;
   }
 }
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  width: max-content;
+  animation: scroll 18s linear infinite;
+} 

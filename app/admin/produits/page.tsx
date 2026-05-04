@@ -88,12 +88,12 @@ function ProduitsContent() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Produits</h1>
-        <button
-          onClick={() => router.push("/admin/produits/add")}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-        >
-          + Ajouter un produit
-        </button>
+       <button
+  onClick={() => router.push("/admin/produits/add")}
+  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base rounded-lg whitespace-nowrap"
+>
+  + Ajouter un produit
+</button>
       </div>
 
       {/* FILTRE */}
@@ -117,74 +117,119 @@ function ProduitsContent() {
       {/* ERREUR */}
       {erreur && <div className="mb-4 text-red-600 font-medium">{erreur}</div>}
 
-      {/* TABLE */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 rounded-lg text-black">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="py-2 px-4 text-left">Image</th>
-              <th className="py-2 px-4 text-left">Nom</th>
-              <th className="py-2 px-4 text-left">Description</th>
-              <th className="py-2 px-4 text-left">Prix</th>
-              <th className="py-2 px-4 text-left">Catégorie</th>
-              <th className="py-2 px-4 text-left">Stock</th>
-              <th className="py-2 px-4 text-center">Actions</th>
-            </tr>
-          </thead>
+     {/* TABLE DESKTOP */}
+<div className="hidden md:block overflow-x-auto">
+  <table className="min-w-full border border-gray-200 rounded-lg text-black">
+    <thead className="bg-gray-100">
+      <tr>
+        <th className="py-2 px-4 text-left">Image</th>
+        <th className="py-2 px-4 text-left">Nom</th>
+        <th className="py-2 px-4 text-left">Description</th>
+        <th className="py-2 px-4 text-left">Prix</th>
+        <th className="py-2 px-4 text-left">Catégorie</th>
+        <th className="py-2 px-4 text-left">Stock</th>
+        <th className="py-2 px-4 text-center">Actions</th>
+      </tr>
+    </thead>
 
-          <tbody>
-            {chargement ? (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  Chargement...
-                </td>
-              </tr>
-            ) : produits.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="text-center py-4 text-gray-500">
-                  Aucun produit trouvé
-                </td>
-              </tr>
-            ) : (
-              produits.map((produit) => {
-                const imageSrc =
-                  produit.images?.[0]?.trim() || "/images/default.jpg";
+    <tbody>
+      {produits.map((produit) => {
+        const imageSrc =
+          produit.images?.[0]?.trim() || "/images/default.jpg";
 
-                return (
-                  <tr key={produit.id} className="border-t hover:bg-gray-50">
-                    <td className="py-2 px-4">
-                      <img
-                        src={imageSrc}
-                        alt={produit.nom}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    </td>
-                    <td className="py-2 px-4">{produit.nom}</td>
-                    <td className="py-2 px-4">{produit.description || "-"}</td>
-                    <td className="py-2 px-4">{produit.prix} DA</td>
-                    <td className="py-2 px-4">{produit.categorie || "-"}</td>
-                    <td className="py-2 px-4">{produit.stock ?? 0}</td>
-                    <td className="py-2 px-4 text-center space-x-2">
-                      <button
-                        onClick={() => modifierProduit(produit.id)}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Modifier
-                      </button>
-                      <button
-                        onClick={() => supprimerProduit(produit.id)}
-                        className="text-red-600 hover:underline"
-                      >
-                        Supprimer
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+        return (
+          <tr key={produit.id} className="border-t hover:bg-gray-50">
+            <td className="py-2 px-4">
+              <img
+                src={imageSrc}
+                alt={produit.nom}
+                className="w-16 h-16 object-cover rounded"
+              />
+            </td>
+            <td className="py-2 px-4">{produit.nom}</td>
+            <td className="py-2 px-4">{produit.description || "-"}</td>
+            <td className="py-2 px-4">{produit.prix} DA</td>
+            <td className="py-2 px-4">{produit.categorie || "-"}</td>
+            <td className="py-2 px-4">{produit.stock ?? 0}</td>
+            <td className="py-2 px-4 text-center space-x-2">
+              <button
+                onClick={() => modifierProduit(produit.id)}
+                className="text-blue-600 hover:underline"
+              >
+                Modifier
+              </button>
+              <button
+                onClick={() => supprimerProduit(produit.id)}
+                className="text-red-600 hover:underline"
+              >
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
+</div> 
+{/* MOBILE CARDS */} 
+<div className="md:hidden space-y-4">
+  {chargement ? (
+    <p className="text-center">Chargement...</p>
+  ) : produits.length === 0 ? (
+    <p className="text-center text-gray-500">
+      Aucun produit trouvé
+    </p>
+  ) : (
+    produits.map((produit) => {
+      const imageSrc =
+        produit.images?.[0]?.trim() || "/images/default.jpg";
+
+      return (
+        <div
+          key={produit.id}
+          className="border rounded-lg p-4 shadow-sm bg-white"
+        >
+          <div className="flex gap-3">
+            <img
+              src={imageSrc}
+              alt={produit.nom}
+              className="w-20 h-20 object-cover rounded"
+            />
+
+            <div>
+              <h2 className="font-semibold">{produit.nom}</h2>
+              <p className="text-sm text-gray-500">
+                {produit.description || "-"}
+              </p>
+              <p className="mt-1 font-medium">
+                {produit.prix} DA
+              </p>
+              <p className="text-sm text-gray-600">
+                {produit.categorie || "-"} • Stock: {produit.stock ?? 0}
+              </p>
+            </div>
+          </div>
+
+          {/* ACTIONS */}
+          <div className="flex justify-end gap-4 mt-3">
+            <button
+              onClick={() => modifierProduit(produit.id)}
+              className="text-blue-600"
+            >
+              Modifier
+            </button>
+            <button
+              onClick={() => supprimerProduit(produit.id)}
+              className="text-red-600"
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      );
+    })
+  )}
+</div>
     </div>
   );
 }
