@@ -1,116 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 
 interface Product {
   id: string;
   nom: string;
   description?: string;
-  prix: number;
   imageUrl?: string | null;
+  prix: number;
+  marque?: string;
   promotion?: number | null;
-}
-
-function Section({
-  title,
-  pack,
-  products,
-}: {
-  title: string;
-  pack: string;
-  products: Product[];
-}) {
-  if (!products || products.length === 0) return null;
-
-  return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-0">
-      {/* TITLE */}
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#212E53] mb-2 text-center sm:text-left">
-        {title}
-      </h2>
-
-      <p className="text-neutral-500 mb-6 sm:mb-8 text-center sm:text-left text-sm sm:text-base">
-        {pack}
-      </p>
-
-      {/* GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-
-        {products.map((prod) => (
-          <Link
-            key={prod.id}
-            href={`/promotions/${prod.id}`}
-            className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition block"
-          >
-            {/* IMAGE */}
-            <div className="relative h-44 sm:h-52 md:h-56 w-full bg-neutral-100">
-              {prod.imageUrl ? (
-                <Image
-                  src={prod.imageUrl}
-                  alt={prod.nom}
-                  fill
-                  className="object-contain p-3 sm:p-4 group-hover:scale-105 transition"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-neutral-400 text-sm">
-                  No Image
-                </div>
-              )}
-
-              {/* BADGE */}
-              <span className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-[#212E53] text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full">
-                -{Number(prod.promotion) || 0}%
-              </span>
-            </div>
-
-            {/* INFOS */}
-            <div className="p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-medium text-black">
-                {prod.nom}
-              </h3>
-
-              <p className="text-xs sm:text-sm text-neutral-500 mt-1 line-clamp-2">
-                {prod.description ?? "Description non disponible"}
-              </p>
-
-              <p className="mt-3 sm:mt-4 text-lg sm:text-xl font-semibold text-[#212E53]">
-                {prod.prix} DA
-              </p>
-
-              {/* BOUTON (VISUEL UNIQUEMENT) */}
-              <div className="mt-3 sm:mt-4">
-                <span className="block text-center w-full py-2 sm:py-3 rounded-full bg-[#212E53] text-white text-sm sm:text-base group-hover:opacity-90 transition">
-                  Voir l’offre
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-
-      </div>
-    </div>
-  );
+  createdAt: string;
 }
 
 export default function PromotionsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState("");
+  const [marqueFilter, setMarqueFilter] = useState("");
+
+  const perPage = 6;
 
   useEffect(() => {
     const fetchPromotions = async () => {
       try {
-        const res = await fetch("/api/promotions", {
-          cache: "no-store",
-        });
-
+        const res = await fetch("/api/promotions", { cache: "no-store" });
         const data = await res.json();
-        const list: Product[] = data?.promotions ?? [];
-
-        setProducts(list);
+        setProducts(data?.promotions ?? []);
       } catch (err) {
-        console.error("Erreur chargement promotions :", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -119,42 +39,175 @@ export default function PromotionsPage() {
     fetchPromotions();
   }, []);
 
-  if (loading) {
-    return (
-      <p className="p-10 text-center text-neutral-500">
-        Chargement...
-      </p>
-    );
-  }
+  useEffect(() => {
+    setPage(1);
+  }, [sort, marqueFilter]);
 
-  const p20 = products.filter((p) => Number(p.promotion) === 20);
-  const p30 = products.filter((p) => Number(p.promotion) === 30);
-  const p35 = products.filter((p) => Number(p.promotion) === 35);
+  const filtered = useMemo(() => {
+    let data = [...products];
+
+    if (marqueFilter) {
+      data = data.filter((p) => p.marque === marqueFilter);
+    }
+
+    if (sort === "price-asc") {
+      data.sort((a, b) => a.prix - b.prix);
+    }
+
+    if (sort === "price-desc") {
+      data.sort((a, b) => b.prix - a.prix);
+    }
+
+    if (sort === "date-new") {
+      data.sort(
+        (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+      );
+    }
+
+    return data;
+  }, [products, sort, marqueFilter]);
+
+  const start = (page - 1) * perPage;
+  const visibleProducts = filtered.slice(start, start + perPage);
+
+  const marques = Array.from(
+    new Set(products.map((p) => p.marque).filter(Boolean))
+  );
+
+  const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
-    <div className="min-h-screen bg-neutral-100 py-10 sm:py-16 lg:py-20 px-4 sm:px-6 space-y-16 sm:space-y-20">
+    <main className="min-h-screen bg-neutral-100 text-black px-6 py-20">
 
-      {/* HEADER */}
-      <div className="text-center max-w-3xl mx-auto px-2">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#212E53] mb-4 sm:mb-6">
-          Nos Promotions
-        </h1>
+      {/* TITLE */}
+      <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16 text-[#DAAB3A]">
+        Promotions
+      </h1>
 
-        <p className="text-sm sm:text-base text-neutral-600">
-          Profitez de nos offres exclusives sur une sélection de lunettes et lentilles.
-        </p>
+      {/* FILTRES (comme Homme) */}
+      <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row gap-4 justify-between">
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="bg-white border border-neutral-300 rounded-xl px-4 py-3"
+        >
+          <option value="">Trier par</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+          <option value="date-new">Nouveautés</option>
+        </select>
+
+        <select
+          value={marqueFilter}
+          onChange={(e) => setMarqueFilter(e.target.value)}
+          className="bg-white border border-neutral-300 rounded-xl px-4 py-3"
+        >
+          <option value="">Toutes les marques</option>
+          {marques.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+
+        <button
+          onClick={() => {
+            setSort("");
+            setMarqueFilter("");
+          }}
+          className="px-6 py-3 rounded-xl bg-[#DAAB3A] text-white hover:opacity-90 transition"
+        >
+          Réinitialiser
+        </button>
       </div>
 
-      {/* SECTIONS */}
-      <Section title="Promotion -20%" pack="Pack Découverte" products={p20} />
-      <Section title="Promotion -30%" pack="Pack Premium" products={p30} />
-      <Section title="Promotion -35%" pack="Pack Luxe" products={p35} />
-
-      {products.length === 0 && (
-        <p className="text-center text-neutral-500 text-sm sm:text-base">
-          Aucune promotion disponible pour le moment.
+      {/* PRODUITS */}
+      {loading ? (
+        <p className="text-center text-neutral-500">Chargement...</p>
+      ) : visibleProducts.length === 0 ? (
+        <p className="text-center text-neutral-500">
+          Aucun produit trouvé.
         </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+
+          {visibleProducts.map((product) => {
+            const imageSrc =
+              product.imageUrl || "/images/default.jpg";
+
+            return (
+              <div
+                key={product.id}
+                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition"
+              >
+
+                {/* IMAGE */}
+                <div className="relative">
+                  <Link href={`/promotions/${product.id}`}>
+                    <img
+                      src={imageSrc}
+                      alt={product.nom}
+                      className="h-64 w-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                  </Link>
+
+                  {/* BADGE PROMO */}
+                  <span className="absolute top-3 left-3 bg-[#DAAB3A] text-white text-xs px-3 py-1 rounded-full">
+                    -{product.promotion || 0}%
+                  </span>
+                </div>
+
+                {/* INFOS */}
+                <div className="p-6">
+
+                  <Link href={`/promotions/${product.id}`}>
+                    <h3 className="text-lg font-medium hover:underline">
+                      {product.nom}
+                    </h3>
+                  </Link>
+
+                  {product.marque && (
+                    <p className="text-sm text-neutral-500 mt-1">
+                      {product.marque}
+                    </p>
+                  )}
+
+                  <p className="text-xl font-semibold mt-3 text-[#DAAB3A]">
+                    {product.prix} DA
+                  </p>
+
+                  <button className="w-full mt-6 py-3 rounded-full bg-[#DAAB3A] text-white hover:opacity-90 transition">
+                    Voir l’offre
+                  </button>
+
+                </div>
+              </div>
+            );
+          })}
+
+        </div>
       )}
-    </div>
+
+      {/* PAGINATION */}
+      <div className="flex justify-center mt-16 gap-2">
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+          (num) => (
+            <button
+              key={num}
+              onClick={() => setPage(num)}
+              className={`px-4 py-2 rounded-full ${
+                page === num
+                  ? "bg-[#DAAB3A] text-white"
+                  : "bg-white border text-neutral-600 hover:bg-neutral-200"
+              }`}
+            >
+              {num}
+            </button>
+          )
+        )}
+      </div>
+
+    </main>
   );
-}  
+}

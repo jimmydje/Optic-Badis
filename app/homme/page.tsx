@@ -25,10 +25,10 @@ export default function HommePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Homme");  
-        if (!res.ok) throw new Error("Erreur API"); 
+        const res = await fetch("/api/produits?categorie=Homme");
+        if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
-        setProducts(data);  
+        setProducts(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -58,7 +58,6 @@ export default function HommePage() {
     alert(`✅ ${product.nom} ajouté au panier`);
   };
 
-  // 🔽 FILTRAGE + TRI
   let filtered = [...products];
 
   if (marqueFilter) {
@@ -79,25 +78,23 @@ export default function HommePage() {
     );
   }
 
-  // 🔽 PAGINATION
   const start = (page - 1) * perPage;
   const visibleProducts = filtered.slice(start, start + perPage);
+
   const marques = Array.from(
     new Set(products.map((p) => p.marque).filter(Boolean))
   );
+
   const totalPages = Math.ceil(filtered.length / perPage);
 
   return (
     <main className="min-h-screen bg-neutral-100 text-black px-6 py-20">
-      
-      {/* TITLE */}
       <h1 className="text-4xl md:text-5xl font-semibold text-center mb-16">
         Collection Homme
       </h1>
 
       {/* FILTRES */}
       <div className="max-w-6xl mx-auto mb-12 flex flex-col md:flex-row gap-4 justify-between">
-        
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
@@ -127,7 +124,7 @@ export default function HommePage() {
             setSort("");
             setMarqueFilter("");
           }}
-          className="px-6 py-3 rounded-xl bg-[#212E53] text-white hover:opacity-90 transition"
+          className="px-6 py-3 rounded-xl bg-[#DAAB3A] text-white hover:opacity-90 transition"
         >
           Réinitialiser
         </button>
@@ -153,8 +150,6 @@ export default function HommePage() {
                 key={product.id}
                 className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer"
               >
-                
-                {/* IMAGE */}
                 <div className="relative">
                   <Link href={`/homme/${product.id}`}>
                     <img
@@ -164,18 +159,16 @@ export default function HommePage() {
                     />
                   </Link>
 
-                  {/* BADGE */}
-                  <span className="absolute top-3 left-3 bg-[#212E53] text-white text-xs px-3 py-1 rounded-full">
+                  <span className="absolute top-3 left-3 bg-[#DAAB3A] text-white text-xs px-3 py-1 rounded-full">
                     Nouveau
                   </span>
                 </div>
 
-                {/* INFOS */}
                 <div className="p-6">
                   <Link href={`/homme/${product.id}`}>
                     <h3 className="text-lg font-medium hover:underline">
                       {product.nom}
-                    </h3>   
+                    </h3>
                   </Link>
 
                   {product.marque && (
@@ -184,13 +177,13 @@ export default function HommePage() {
                     </p>
                   )}
 
-                  <p className="text-xl font-semibold mt-3 text-[#212E53]">
+                  <p className="text-xl font-semibold mt-3 text-[#DAAB3A]">
                     {product.prix} DA
                   </p>
 
                   <button
                     onClick={() => addToCart(product)}
-                    className="w-full mt-6 py-3 rounded-full bg-[#212E53] text-white hover:opacity-90 transition"
+                    className="w-full mt-6 py-3 rounded-full bg-[#DAAB3A] text-white hover:opacity-90 transition"
                   >
                     Ajouter au panier
                   </button>
@@ -210,7 +203,7 @@ export default function HommePage() {
               onClick={() => setPage(num)}
               className={`px-4 py-2 rounded-full ${
                 page === num
-                  ? "bg-[#212E53] text-white"
+                  ? "bg-[#DAAB3A] text-white"
                   : "bg-white border border-neutral-300 text-neutral-600 hover:bg-neutral-200"
               } transition`}
             >
@@ -219,7 +212,6 @@ export default function HommePage() {
           )
         )}
       </div>
-
     </main>
   );
-}  
+} 

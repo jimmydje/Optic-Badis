@@ -14,8 +14,6 @@ interface Product {
 
 export default function ProduitDetailPage() {
   const params = useParams();
-
-  // ✅ FIX IMPORTANT
   const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -33,9 +31,7 @@ export default function ProduitDetailPage() {
         const res = await fetch(`/api/produits/${id}`);
         const data = await res.json();
 
-        if (!res.ok) {
-          throw new Error(data?.error || "Produit introuvable");
-        }
+        if (!res.ok) throw new Error();
 
         setProduct(data);
       } catch (error) {
@@ -77,12 +73,12 @@ export default function ProduitDetailPage() {
     <div className="min-h-screen bg-white text-black">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2">
 
-        {/* IMAGE */}
-        <div className="flex flex-col items-center justify-center p-10">
+        {/* ===== LEFT IMAGE ===== */}
+        <div className="bg-gray-50 flex flex-col items-center justify-center p-6 md:p-10">
 
           {images.length > 0 ? (
             <>
-              <div className="relative w-full h-[400px] rounded-2xl overflow-hidden bg-gray-50">
+              <div className="relative w-full max-w-xl h-[350px] md:h-[420px]">
                 <Image
                   src={images[mainImageIndex]}
                   alt={product.nom}
@@ -91,22 +87,23 @@ export default function ProduitDetailPage() {
                 />
               </div>
 
-              <div className="flex gap-3 mt-6">
+              {/* MINIATURES */}
+              <div className="flex gap-3 mt-6 flex-wrap justify-center">
                 {images.map((img, idx) => (
                   <div
                     key={idx}
                     onClick={() => setMainImageIndex(idx)}
-                    className={`w-16 h-16 rounded-lg overflow-hidden border cursor-pointer ${
+                    className={`w-20 h-16 rounded-md overflow-hidden border cursor-pointer ${
                       idx === mainImageIndex
-                        ? "border-black"
-                        : "border-gray-300"
+                        ? "border-[#DAAB3A]"
+                        : "border-gray-300 hover:border-[#DAAB3A]"
                     }`}
                   >
                     <Image
                       src={img}
                       alt={product.nom}
-                      width={64}
-                      height={64}
+                      width={80}
+                      height={60}
                       className="object-cover"
                     />
                   </div>
@@ -114,43 +111,44 @@ export default function ProduitDetailPage() {
               </div>
             </>
           ) : (
-            <p>No image</p>
+            <p>Aucune image</p>
           )}
         </div>
 
-        {/* INFOS */}
-        <div className="bg-[#212E53] text-white p-10 flex flex-col justify-center space-y-6">
+        {/* ===== RIGHT INFOS ===== */}
+        <div className="p-6 md:p-10 flex flex-col gap-6 justify-center">
 
-          <h1 className="text-3xl font-bold">{product.nom}</h1>
+          {/* TITLE */}
+          <h1 className="text-2xl md:text-3xl font-semibold hover:text-[#DAAB3A] transition">
+            {product.nom}
+          </h1>
 
-          <p className="text-2xl font-semibold">
-            DA {product.prix ?? 0}
+          {/* PRIX */}
+          <p className="text-2xl font-semibold text-[#DAAB3A]">
+            {product.prix ?? 0} DA
           </p>
 
-          <div className="bg-white/20 py-3 text-center rounded">
-            Disponible
-          </div>
-
-          <hr className="border-white/30" />
-
-          <p className="text-sm text-white/80">
+          {/* DESCRIPTION */}
+          <p className="text-gray-600 text-sm leading-relaxed">
             {product.description || "Aucune description disponible."}
           </p>
 
+          {/* BOUTON */}
           <button
             onClick={() => addToCart(product)}
-            className="mt-6 bg-white text-[#212E53] py-3 font-semibold rounded-lg"
+            className="mt-6 w-full bg-[#DAAB3A] text-white py-4 rounded-full text-lg hover:opacity-90 transition shadow-md"
           >
             Ajouter au panier
           </button>
         </div>
       </div>
 
+      {/* TOAST */}
       {toast && (
-        <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg">
+        <div className="fixed bottom-5 right-5 bg-[#DAAB3A] text-white px-4 py-2 rounded-lg shadow-lg">
           {toast}
         </div>
       )}
     </div>
   );
-}  
+} 

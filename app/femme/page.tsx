@@ -26,7 +26,7 @@ export default function FemmePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/produits?categorie=Femme");   
+        const res = await fetch("/api/produits?categorie=Femme");
         if (!res.ok) throw new Error("Erreur API");
         const data = await res.json();
         setProducts(data);
@@ -34,7 +34,7 @@ export default function FemmePage() {
         console.error(err);
       } finally {
         setLoading(false);
-      }  
+      }
     };
     fetchProducts();
   }, []);
@@ -67,7 +67,6 @@ export default function FemmePage() {
     return data;
   }, [products, sort, marqueFilter]);
 
-  // ✅ FIX UNIQUEMENT ICI (panier fonctionnel)
   const addToCart = (product: Product) => {
     try {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -92,8 +91,6 @@ export default function FemmePage() {
       }
 
       localStorage.setItem("cart", JSON.stringify(cart));
-
-      // 🔥 sync live panier
       window.dispatchEvent(new Event("cartUpdated"));
 
       console.log("✅ Ajouté au panier :", product.nom);
@@ -148,7 +145,7 @@ export default function FemmePage() {
             setSort("");
             setMarqueFilter("");
           }}
-          className="px-6 py-3 rounded-xl bg-[#212E53] text-white"
+          className="px-6 py-3 rounded-xl bg-[#DAAB3A] text-white"
         >
           Réinitialiser
         </button>
@@ -183,7 +180,7 @@ export default function FemmePage() {
                     />
                   </Link>
 
-                  <span className="absolute top-3 left-3 bg-[#212E53] text-white text-xs px-3 py-1 rounded-full">
+                  <span className="absolute top-3 left-3 bg-[#DAAB3A] text-white text-xs px-3 py-1 rounded-full">
                     Nouveau
                   </span>
                 </div>
@@ -201,14 +198,13 @@ export default function FemmePage() {
                     </p>
                   )}
 
-                  <p className="text-xl font-semibold mt-3 text-[#212E53]">
+                  <p className="text-xl font-semibold mt-3 text-[#DAAB3A]">
                     {product.prix} DA
                   </p>
 
-                  {/* ✅ BOUTON FIXÉ */}
                   <button
                     onClick={() => addToCart(product)}
-                    className="w-full mt-6 py-3 rounded-full bg-[#212E53] text-white"
+                    className="w-full mt-6 py-3 rounded-full bg-[#DAAB3A] text-white"
                   >
                     Ajouter au panier
                   </button>
@@ -227,7 +223,7 @@ export default function FemmePage() {
             onClick={() => setPage(num)}
             className={`px-4 py-2 rounded-full ${
               page === num
-                ? "bg-[#212E53] text-white"
+                ? "bg-[#DAAB3A] text-white"
                 : "bg-white border text-neutral-600"
             }`}
           >
@@ -237,4 +233,4 @@ export default function FemmePage() {
       </div>
     </main>
   );
-}  
+} 

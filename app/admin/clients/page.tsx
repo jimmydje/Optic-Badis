@@ -63,80 +63,120 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="text-black">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Clients</h1>
+    <div className="text-black p-4 md:p-6">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
+        <h1 className="text-2xl font-semibold text-center md:text-left">
+          Clients
+        </h1>
 
         <button
           onClick={() => router.push("/admin/clients/add")}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg w-full md:w-auto"
         >
           + Ajouter un client
         </button>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow">
+      {/* CONTENT */}
+      <div className="bg-white p-4 md:p-6 rounded-xl shadow">
         {clients.length === 0 ? (
           <p className="text-center text-gray-500">Aucun client trouvé.</p>
         ) : (
-          <table className="w-full border-collapse text-left text-black">
-            <thead>
-              <tr className="border-b bg-gray-100 text-black">
-                <th className="py-2 px-3">Nom</th>
-                <th className="py-2 px-3">Email</th>
-                <th className="py-2 px-3">Téléphone</th>
-                <th className="py-2 px-3">Commandes</th>
-                <th className="py-2 px-3">Date d’inscription</th>
-                <th className="py-2 px-3 text-center">Actions</th>
-              </tr>
-            </thead>
+          <>
+            {/* ✅ TABLE DESKTOP */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="border-b bg-gray-100">
+                    <th className="py-2 px-3">Nom</th>
+                    <th className="py-2 px-3">Email</th>
+                    <th className="py-2 px-3">Téléphone</th>
+                    <th className="py-2 px-3">Commandes</th>
+                    <th className="py-2 px-3">Date</th>
+                    <th className="py-2 px-3 text-center">Actions</th>
+                  </tr>
+                </thead>
 
-            <tbody className="text-black">
+                <tbody>
+                  {clients.map((c) => (
+                    <tr key={c.id} className="border-b hover:bg-gray-50">
+                      <td className="py-2 px-3">{c.nom || "—"}</td>
+                      <td className="py-2 px-3">{c.email || "—"}</td>
+                      <td className="py-2 px-3">{c.telephone || "—"}</td>
+                      <td className="py-2 px-3">
+                        {c.commandes?.length || 0}
+                      </td>
+                      <td className="py-2 px-3">
+                        {c.createdAt
+                          ? new Date(c.createdAt).toLocaleDateString("fr-FR")
+                          : "—"}
+                      </td>
+                      <td className="py-2 px-3 text-center space-x-3">
+                        <button
+                          onClick={() =>
+                            router.push(`/admin/clients/${c.id}/edit`)
+                          }
+                          className="text-blue-600 hover:underline"
+                        >
+                          Modifier
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(c.id)}
+                          className="text-red-600 hover:underline"
+                        >
+                          Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* ✅ CARDS MOBILE */}
+            <div className="md:hidden space-y-4">
               {clients.map((c) => (
-                <tr key={c.id} className="border-b hover:bg-gray-50 transition">
-                  <td className="py-2 px-3 font-medium">
-                    {c.nom || "—"}
-                  </td>
+                <div
+                  key={c.id}
+                  className="border rounded-lg p-4 shadow-sm"
+                >
+                  <p className="font-semibold text-lg">{c.nom || "—"}</p>
+                  <p className="text-sm text-gray-600">{c.email}</p>
 
-                  <td className="py-2 px-3">
-                    {c.email || "—"}
-                  </td>
+                  <div className="mt-2 text-sm space-y-1">
+                    <p><span className="font-medium">Téléphone :</span> {c.telephone || "—"}</p>
+                    <p><span className="font-medium">Commandes :</span> {c.commandes?.length || 0}</p>
+                    <p>
+                      <span className="font-medium">Date :</span>{" "}
+                      {c.createdAt
+                        ? new Date(c.createdAt).toLocaleDateString("fr-FR")
+                        : "—"}
+                    </p>
+                  </div>
 
-                  <td className="py-2 px-3">
-                    {c.telephone || "—"}
-                  </td>
-
-                  <td className="py-2 px-3">
-                    {c.commandes?.length || 0}
-                  </td>
-
-                  <td className="py-2 px-3">
-                    {c.createdAt
-                      ? new Date(c.createdAt).toLocaleDateString("fr-FR")
-                      : "—"}
-                  </td>
-
-                  <td className="py-2 px-3 text-center space-x-3">
+                  <div className="flex justify-between mt-4">
                     <button
                       onClick={() =>
                         router.push(`/admin/clients/${c.id}/edit`)
                       }
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 text-sm"
                     >
                       Modifier
                     </button>
 
                     <button
                       onClick={() => handleDelete(c.id)}
-                      className="text-red-600 hover:underline"
+                      className="text-red-600 text-sm"
                     >
                       Supprimer
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </>
         )}
       </div>
     </div>

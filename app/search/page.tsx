@@ -13,20 +13,16 @@ interface Product {
   categorie?: string;
 }
 
-/* 🔥 Mapping des routes (TRÈS IMPORTANT) */
 function getProductLink(p: Product) {
   const cat = p.categorie?.toLowerCase() || "";
 
-  // catégories simples
   if (cat === "enfant" || cat === "enfants") return `/enfants/${p.id}`;
   if (cat === "homme" || cat === "hommes") return `/homme/${p.id}`;
   if (cat === "femme" || cat === "femmes") return `/femme/${p.id}`;
 
-  // solaire (sous catégories)
   if (cat === "solaire homme") return `/solaire/hommes/${p.id}`;
   if (cat === "solaire femme") return `/solaire/femmes/${p.id}`;
 
-  // fallback (au cas où)
   return `/${cat}/${p.id}`;
 }
 
@@ -56,9 +52,8 @@ function SearchContent() {
   }, [query]);
 
   return (
-    <main className="min-h-screen bg-white text-[#212E53] px-6 py-20">
+    <main className="min-h-screen bg-white text-[#DAAB3A] px-6 py-20">
 
-      {/* TITLE */}
       <h1 className="text-3xl font-semibold mb-10 text-center">
         Résultats pour : <span>"{query}"</span>
       </h1>
@@ -75,7 +70,6 @@ function SearchContent() {
 
               <div className="group bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition cursor-pointer">
 
-                {/* IMAGE */}
                 <div className="h-56 w-full overflow-hidden">
                   <img
                     src={p.images?.[0] || "/placeholder.jpg"}
@@ -84,7 +78,6 @@ function SearchContent() {
                   />
                 </div>
 
-                {/* CONTENT */}
                 <div className="p-4">
                   <h3 className="font-semibold">
                     {p.nom}
@@ -96,13 +89,12 @@ function SearchContent() {
                     </p>
                   )}
 
-                  <p className="mt-2 font-bold">
+                  <p className="mt-2 font-bold text-[#DAAB3A]">
                     {p.prix} DA
                   </p>
                 </div>
 
-                {/* BAR */}
-                <div className="bg-[#212E53] text-white text-xs px-4 py-2">
+                <div className="bg-[#DAAB3A] text-white text-xs px-4 py-2">
                   Paiement à la livraison
                 </div>
 
@@ -121,7 +113,7 @@ export default function SearchPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-white text-[#212E53] px-6 py-20 text-center">
+        <div className="min-h-screen bg-white text-[#DAAB3A] px-6 py-20 text-center">
           Chargement...
         </div>
       }
@@ -129,4 +121,4 @@ export default function SearchPage() {
       <SearchContent />
     </Suspense>
   );
-}  
+}

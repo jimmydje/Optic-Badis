@@ -90,7 +90,7 @@ export default function PanierPage() {
 
         <a
           href="/"
-          className="mt-6 bg-[#212E53] text-white px-6 py-2 rounded-full"
+          className="mt-6 bg-[#DAAB3A] text-white px-6 py-2 rounded-full"
         >
           Continuer vos achats
         </a>
@@ -106,7 +106,7 @@ export default function PanierPage() {
 
       <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 border">
 
-        {/* ================= TABLE DESKTOP ================= */}
+        {/* TABLE DESKTOP */}
         <div className="hidden md:block">
           <table className="w-full text-left mb-8">
             <thead>
@@ -138,13 +138,10 @@ export default function PanierPage() {
           </table>
         </div>
 
-        {/* ================= MOBILE CARDS ================= */}
+        {/* MOBILE */}
         <div className="md:hidden space-y-4 mb-6">
           {cart.map((item) => (
-            <div
-              key={item.id}
-              className="border rounded-lg p-4 shadow-sm"
-            >
+            <div key={item.id} className="border rounded-lg p-4 shadow-sm">
               <h3 className="font-semibold">{item.nom}</h3>
               <p className="text-sm text-gray-600">
                 Prix: {item.prix} DA
@@ -161,7 +158,7 @@ export default function PanierPage() {
           ))}
         </div>
 
-        {/* ================= FORM + TOTAL ================= */}
+        {/* FORM + TOTAL */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* FORM */}
@@ -188,7 +185,7 @@ export default function PanierPage() {
           <div className="flex flex-col justify-between">
             <div className="border p-4 rounded-xl text-right">
               <p className="text-gray-500">Total</p>
-              <p className="text-2xl font-bold text-[#212E53]">
+              <p className="text-2xl font-bold text-[#DAAB3A]">
                 {total} DA
               </p>
             </div>
@@ -196,7 +193,7 @@ export default function PanierPage() {
             <button
               onClick={passerCommande}
               disabled={!nom || !email || !telephone || !adresse || !ville}
-              className="mt-4 w-full bg-[#212E53] text-white py-3 rounded-xl disabled:bg-gray-300"
+              className="mt-4 w-full bg-[#DAAB3A] text-white py-3 rounded-xl disabled:bg-gray-300"
             >
               Passer la commande
             </button>
@@ -205,7 +202,6 @@ export default function PanierPage() {
         </div>
       </div>
 
-      {/* input style */}
       <style jsx>{`
         .input {
           width: 100%;
@@ -217,8 +213,7 @@ export default function PanierPage() {
       `}</style>
     </main>
   );
-}  
-
+} 
 
 
 
